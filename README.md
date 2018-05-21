@@ -1,2 +1,5 @@
 # petstagram_back
-web site petstagram backend
+Web site
+petstagram backend code
+
+Django Framework used
