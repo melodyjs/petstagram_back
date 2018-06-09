@@ -30,39 +30,39 @@ However, Request MUST have it.
 ### /login  
 - [POST]  
   body  
-  `{  
+  {  
     "email" : "example@petstagram.com",  
     "password" : "example"  
-  }'  
+  }  
   
 - response  
-  `{  
+  {  
     token : 90kadjkf1la0aj3k2aopsdfp  
-   }`  
+   }  
   
 ### /register  
 - [POST]  
   body  
-  `{  
+  {  
     "email" : "example@petstagram.com",  
     "password" : "example",  
     "username" : "example",  
     "petName" : "example"  
-  }`  
+  }  
   
 - respose  
-  `{  
+  {  
       user_id : 123,  
       pet_id : 231,  
       success : true  
-  }`  
+  }  
   
 ### /user/:user_id  
 - [GET]  
   /user/123  
   
 - response  
-  '{  
+  {  
       user_id : 123,  
       email : example@petstagram.com,  
       username : example,  
@@ -75,58 +75,58 @@ However, Request MUST have it.
       totalFollowing : 217,  
       totalFollowed : 102,  
       followingNames : [James, Sally, Hong]  
-  }`  
+  }  
   
 ### /user  
 - [GET]  
   /user?userEmail=example@example.com  
   
 - response  
-  `{  
+  {  
       userProfileImage : www.example.com/pic,  
       userEmail : example@petstagram.com,  
       introduceText : hello world  
-  }`  
+  }  
   
 ### /userFilter  
 - [GET]  
   /userFilter?userEmail=ex  
   
 - reponse  
-  `{  
+  {  
       num : 3,  
       result : [example, example1, example3]  
-  }`  
+  }  
   
 ### /pet  
 - [GET]  
   /pet?id=231  
   
 - response  
-  `{  
+  {  
       petProfileImage : www.example.com/pic,  
       petName : examplePet  
-  }`  
+  }  
   
 - [POST]  
   body  
-  `{  
+  {  
       "petName" : "examplePet"  
-  }`  
+  }  
   
 - response  
-  `{  
+  {  
       pet_id : 231,  
       success : true  
-  }`  
+  }  
 
 ### /pet/:pet_id  
 - [GET]  
   /pet/231  
-  `{  
+  {  
       pet_id : 231,  
       petName : examplePet  
-  }`  
+  }  
   
 
   
