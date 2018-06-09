@@ -76,8 +76,12 @@ app.post('/register', function (req, res) {
 		user.login_password = login_password;
 		user.sign_in_date = sign_in_date;
 
+		users.push(user);
+
 		var pet = new pet();
 		pet.pet_name = pet_name;
+
+		pets.push(pet);
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
     	res.end('{success:true}');
@@ -98,7 +102,21 @@ app.get('/user/:user_id', function (req, res) {
 	var user_id = req.params.user_id;
 
     res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end('user id = ' + users[user_id].user_id);
+    res.end('user id = ' + users[user_id].user_id + '\n'
+    		'login_id = ' + users[user_id].login_id + '\n'
+    		'login_password = ' + users[user_id].login_password + '\n'
+    		'sign_in_date = ' + users[user_id].sign_in_date);
+});
+
+app.get('/pet/:pet_id', function (req, res) {
+
+	//var parsedUrl = url.parse(request.url);
+	//var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
+	var pet_id = req.params.pet_id;
+
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end('pet id = ' + pets[pet_id].pet_id + '\n'
+    		'pet_name = ' + pets[pet_id].pet_name + '\n');
 });
 
 
