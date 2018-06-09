@@ -125,9 +125,9 @@ app.get('/user/:user_id', function (req, res) {
 	var user_id = req.params.user_id;
 
     res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end('user id = ' + users[user_id].user_id + '\n'
-    		'login_id = ' + users[user_id].login_id + '\n'
-    		'login_password = ' + users[user_id].login_password + '\n'
+    res.end('user id = ' + users[user_id].user_id + '\n' +
+    		'login_id = ' + users[user_id].login_id + '\n' +
+    		'login_password = ' + users[user_id].login_password + '\n' +
     		'sign_in_date = ' + users[user_id].sign_in_date);
 });
 
@@ -138,7 +138,7 @@ app.get('/pet/:pet_id', function (req, res) {
 	var pet_id = req.params.pet_id;
 
     res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end('pet id = ' + pets[pet_id].pet_id + '\n'
+    res.end('pet id = ' + pets[pet_id].pet_id + '\n' +
     		'pet_name = ' + pets[pet_id].pet_name + '\n');
 });
 
