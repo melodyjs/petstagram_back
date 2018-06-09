@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 var http = require('http');
 var url = require('url');
 var querystring = require('querystring');
-var port = 3000;
+var port = 8000;
 
 // Debugging mode
 var debug = false;
@@ -36,6 +36,11 @@ function user(){
 
 };
 
+function addUser(user){
+	users.push(user);
+	//TODO connect database
+}
+
 function pet(){
 
 	this.pet_id = pet_count++;
@@ -44,6 +49,11 @@ function pet(){
 	this.intro = "";
 
 };
+
+function addPet(pet){
+	pets.push(pet);
+	//TODO connect database
+}
 
 function dev_init(){
 	for(var i=0; i<10; i++){
@@ -61,17 +71,18 @@ app.get('/', function (req, res) {
 
 app.post('/register', function (req, res) {
 
-	var user_id = user_count++;
+	var user_id = user_count;
 	var login_id = req.body.email;
+
 	var login_password = req.body.password;
-	var user_nickname = "";
+	var user_nickname = req.body.username;
 	var profile_pic_url = "";
 	var sign_in_date = Date.now();
 	var intro = "";
 
 	if(debug){
 		console.log('-----------------USER REGISTER------------');
-		console.log('user_id = ' + user_id);
+		console.log('user_id = ' + user_id+1);
 		console.log('login_id = ' + login_id);
 		console.log('login_password = ' + login_password);
 		console.log('user_nickname = ' + user_nickname);
@@ -81,13 +92,13 @@ app.post('/register', function (req, res) {
 	}
 
 	var pet_name = req.body.petName;
-	var pet_id = pet_count++;
+	var pet_id = pet_count;
 	var profile_pic_url = "";
 	var intro = "";
 
 	if(debug){
 		console.log('-----------------PET REGISTER-------------');
-		console.log('pet_id = ' + pet_id);
+		console.log('pet_id = ' + pet_id+1);
 		console.log('pet_name = ' + pet_name);
 		console.log('profile_pic_url = ' + profile_pic_url);
 		console.log('intro = ' + intro);
@@ -95,21 +106,21 @@ app.post('/register', function (req, res) {
 
 	if(user_id && login_id && login_password && pet_name){
 
-		var user = new user();
-		user.user_id = user_id;
-		user.login_id = login_id;
-		user.login_password = login_password;
-		user.sign_in_date = sign_in_date;
+		var u = new user();
+		u.user_id = user_id;
+		u.login_id = login_id;
+		u.login_password = login_password;
+		u.sign_in_date = sign_in_date;
 
-		users.push(user);
+		addUser(u);
 
-		var pet = new pet();
-		pet.pet_name = pet_name;
+		var p = new pet();
+		p.pet_name = pet_name;
 
-		pets.push(pet);
+		addPet(p);
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('{user_id : ' + user_id  + ', pet_id :' + pet_id + 'success :true}');
+    	res.end('{user_id : ' + user_id  + ', pet_id :' + pet_id + ', success :true}');
 
 	}
 	else{
@@ -144,6 +155,6 @@ app.get('/pet/:pet_id', function (req, res) {
 
 
 app.listen(port, function (){
-	console.log('PetStagram listening on port 3000!');
-	dev_init();
+	console.log('PetStagram listening on port ' + port);
+	dev_init(); // TODO database connection
 });
