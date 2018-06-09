@@ -171,11 +171,63 @@ app.get('/user/:user_id', function (req, res) {
 
 	var user_id = req.params.user_id;
 
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end('user id = ' + users[user_id].user_id + '\n' +
-    		'login_id = ' + users[user_id].login_id + '\n' +
-    		'login_password = ' + users[user_id].login_password + '\n' +
-    		'sign_in_date = ' + users[user_id].sign_in_date);
+	if(user_id < user_count){
+	    res.writeHead(200, {'Content-Type': 'text/html'});
+	    res.end('user id = ' + users[user_id].user_id + '\n' +
+	    		'login_id = ' + users[user_id].login_id + '\n' +
+	    		'login_password = ' + users[user_id].login_password + '\n' +
+	    		'sign_in_date = ' + users[user_id].sign_in_date);
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.end('No user is found');
+	}
+
+});
+
+app.get('/user', function (req, res) {
+
+	var parsedUrl = url.parse(req.url);
+	var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
+
+	var userEmail = parsedQuery.userEmail;
+
+	var idFound = users.find((user) => user.login_id == userEmail);
+
+	if(idFound){
+
+		res.writeHead(200, {'Content-Type': 'text/html'});
+    	res.end('{userProfileImage : ' + idFound.profile_pic_url + ', userEmail : ' + userEmail + ', introduceText : ' + idFound.intro + '}');
+
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.end('User e-mail not found');
+	}
+
+
+});
+
+app.get('/pet', function (req, res) {
+
+	var parsedUrl = url.parse(req.url);
+	var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
+
+	var pet_id = parsedQuery.id;
+
+	var idFound = pets.find((pet) => pet.pet_id == pet_id);
+
+	if(idFound){
+
+		res.writeHead(200, {'Content-Type': 'text/html'});
+    	res.end('{petProfileImage : ' + idFound.profile_pic_url + ', petName : ' + idFound.pet_name + '}');
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.end('The pet is not found');
+	}
+
+
 });
 
 app.post('/pet', function (req, res) {
@@ -206,9 +258,17 @@ app.get('/pet/:pet_id', function (req, res) {
 	//var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
 	var pet_id = req.params.pet_id;
 
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end('pet id = ' + pets[pet_id].pet_id + '\n' +
+	if(pet_id < pet_count){
+		res.writeHead(200, {'Content-Type': 'text/html'});
+    	res.end('pet id = ' + pets[pet_id].pet_id + '\n' +
     		'pet_name = ' + pets[pet_id].pet_name + '\n');
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.end('No pet is found');
+	}
+
+    
 });
 
 
