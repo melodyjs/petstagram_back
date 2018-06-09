@@ -83,7 +83,7 @@ app.post('/login', function (req, res) {
 
 		if(idFound.login_password == login_password){
 			res.writeHead(200, {'Content-Type': 'text/html'});
-    		res.end('{accessToken : ' + SHA256(login_id + login_password) + '}');
+    		res.end('{token : ' + SHA256(login_id + login_password) + '}');
 		}
 		else{
 			res.writeHead(404, {'Content-Type': 'text/html'});
@@ -136,26 +136,33 @@ app.post('/register', function (req, res) {
 
 	if(login_id && user_nickname && login_password && pet_name){
 
-		var u = new user();
-		u.user_id = user_id;
-		u.login_id = login_id;
-		u.login_password = login_password;
-		u.sign_in_date = sign_in_date;
+		if(login_id.includes('@')){
 
-		addUser(u);
+			var u = new user();
+			u.user_id = user_id;
+			u.login_id = login_id;
+			u.login_password = login_password;
+			u.sign_in_date = sign_in_date;
 
-		var p = new pet();
-		p.pet_name = pet_name;
+			addUser(u);
 
-		addPet(p);
+			var p = new pet();
+			p.pet_name = pet_name;
 
-		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('{user_id : ' + user_id  + ', pet_id :' + pet_id + ', success : true}');
+			addPet(p);
+
+			res.writeHead(200, {'Content-Type': 'text/html'});
+	    	res.end('{user_id : ' + user_id  + ', pet_id :' + pet_id + ', success : true}');
+    	}
+    	else{
+    		res.writeHead(404, {'Content-Type': 'text/html'});
+    		res.end('User ID is not email-form');
+    	}
 
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('register error');
+    	res.end('Mandatory datum are not provided');
 	}
     
 });
@@ -169,6 +176,28 @@ app.get('/user/:user_id', function (req, res) {
     		'login_id = ' + users[user_id].login_id + '\n' +
     		'login_password = ' + users[user_id].login_password + '\n' +
     		'sign_in_date = ' + users[user_id].sign_in_date);
+});
+
+app.post('/pet', function (req, res) {
+
+	var petName = req.body.petName;
+
+	if(petName){
+
+		var p = new pet();
+		p.pet_name = petName;
+
+		addPet(p);
+
+		res.writeHead(200, {'Content-Type': 'text/html'});
+	    res.end('{pet_id :' + p.pet_id + ', success : true}');
+
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.end('Pet\'s name is not provided');
+	}
+
 });
 
 app.get('/pet/:pet_id', function (req, res) {
