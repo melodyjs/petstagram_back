@@ -167,16 +167,24 @@ app.post('/register', function (req, res) {
     
 });
 
-app.get('/user/:userEmail', function (req, res) {
+app.get('/user/:user_id', function (req, res) {
 
 	var user_id = req.params.user_id;
 
 	if(user_id < user_count){
 	    res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.end('user id = ' + users[user_id].user_id + '\n' +
-	    		'login_id = ' + users[user_id].login_id + '\n' +
-	    		'login_password = ' + users[user_id].login_password + '\n' +
-	    		'sign_in_date = ' + users[user_id].sign_in_date);
+	    res.end('{user_id : ' + users[user_id].user_id + ', ' +
+	    		'email : ' + users[user_id].login_id + ', ' +
+	    		'username : ' + users[user_id].user_nickname + ', ' + 
+	    		'userProfileImage : ' + users[user_id].profile_pic_url + ', ' + 
+				'introduceText : ' + users[user_id].intro + ', ' +
+				'pet_id : ' + 'NOT IMPLEMENTED' + ', ' + 
+				'card_id : ' + 'NOT IMPLEMENTED' + ', ' + 
+				'userBirthDay : ' + 'NOT IMPLEMENTED' + ', ' + 
+				'totalPost : ' + 'NOT IMPLEMENTED' + ', ' +
+				'totalFollowing : ' + 'NOT IMPLEMENTED' + ', ' +
+				'totalFollowed : ' + 'NOT IMPLEMENTED' + ', ' +
+				'followingNames : ' + 'NOT IMPLEMENTED' + '}');
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
@@ -219,7 +227,7 @@ app.get('/userFilter', function (req, res) {
 
 	if(idFound){
 
-		var json = '{num:' + idFound.length + ', array : [';
+		var json = '{num:' + idFound.length + ', result : [';
 
 		idFound.forEach((u) => 
 			json = json + '\"' + u.login_id + '\", '
@@ -291,8 +299,8 @@ app.get('/pet/:pet_id', function (req, res) {
 
 	if(pet_id < pet_count){
 		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('pet id = ' + pets[pet_id].pet_id + '\n' +
-    		'pet_name = ' + pets[pet_id].pet_name + '\n');
+    	res.end('{pet_id : ' + pets[pet_id].pet_id + ', ' +
+    		'petName = ' + pets[pet_id].pet_name + '}');
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
