@@ -58,7 +58,7 @@ function addPet(pet){
 function dev_init(){
 	for(var i=0; i<10; i++){
 		var u = new user();
-		u.login_id = i;
+		u.login_id = 'test' + i;
 		u.login_password = SHA256("" + i);
 		users.push(u);
 	}
@@ -167,7 +167,7 @@ app.post('/register', function (req, res) {
     
 });
 
-app.get('/user/:user_id', function (req, res) {
+app.get('/user/:userEmail', function (req, res) {
 
 	var user_id = req.params.user_id;
 
@@ -198,6 +198,37 @@ app.get('/user', function (req, res) {
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
     	res.end('{userProfileImage : ' + idFound.profile_pic_url + ', userEmail : ' + userEmail + ', introduceText : ' + idFound.intro + '}');
+
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.end('User e-mail not found');
+	}
+
+
+});
+
+app.get('/userFilter', function (req, res) {
+
+	var parsedUrl = url.parse(req.url);
+	var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
+
+	var userEmail = parsedQuery.userEmail;
+
+	var idFound = users.filter((user) => user.login_id.includes(userEmail));
+
+	if(idFound){
+
+		var json = '{num:' + idFound.length + ', array : [';
+
+		idFound.forEach((u) => 
+			json = json + '\"' + u.login_id + '\", '
+    	)
+
+    	json = json.substring(0, json.length-2) + ']}';
+
+    	res.writeHead(200, {'Content-Type': 'text/html'});
+	    res.end(json);
 
 	}
 	else{
