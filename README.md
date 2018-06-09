@@ -4,8 +4,10 @@ petstagram backend code
 
 Node.js used
 
-#Usage
+## Usage
 1. install node.js and express
-2. move to nodeServer folder
-3. type 
-node petStagram.js
+2. type
+`git clone https://github.com/melodyjs/petstagram_back.git
+3. move to nodeServer folder
+4. type 
+`node petStagram.js
