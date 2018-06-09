@@ -13,6 +13,9 @@ var url = require('url');
 var querystring = require('querystring');
 var port = 3000;
 
+// Debugging mode
+var debug = false;
+
 
 // Database for dev
 var user_count = 0;
@@ -66,7 +69,29 @@ app.post('/register', function (req, res) {
 	var sign_in_date = Date.now();
 	var intro = "";
 
+	if(debug){
+		console.log('-----------------USER REGISTER------------');
+		console.log('user_id = ' + user_id);
+		console.log('login_id = ' + login_id);
+		console.log('login_password = ' + login_password);
+		console.log('user_nickname = ' + user_nickname);
+		console.log('profile_pic_url = ' + profile_pic_url);
+		console.log('sign_in_date = ' + sign_in_date);
+		console.log('intro = ' + intro);
+	}
+
 	var pet_name = req.body.petName;
+	var pet_id = pet_count++;
+	var profile_pic_url = "";
+	var intro = "";
+
+	if(debug){
+		console.log('-----------------PET REGISTER-------------');
+		console.log('pet_id = ' + pet_id);
+		console.log('pet_name = ' + pet_name);
+		console.log('profile_pic_url = ' + profile_pic_url);
+		console.log('intro = ' + intro);
+	}
 
 	if(user_id && login_id && login_password && pet_name){
 
@@ -84,7 +109,7 @@ app.post('/register', function (req, res) {
 		pets.push(pet);
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('{success:true}');
+    	res.end('{user_id : ' + user_id  + ', pet_id :' + pet_id + 'success :true}');
 
 	}
 	else{
@@ -97,8 +122,6 @@ app.post('/register', function (req, res) {
 
 app.get('/user/:user_id', function (req, res) {
 
-	//var parsedUrl = url.parse(request.url);
-	//var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
 	var user_id = req.params.user_id;
 
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -121,6 +144,6 @@ app.get('/pet/:pet_id', function (req, res) {
 
 
 app.listen(port, function (){
-	console.log('Example app listening on port 3000!');
+	console.log('PetStagram listening on port 3000!');
 	dev_init();
 });
