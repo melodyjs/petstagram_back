@@ -6,27 +6,29 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
+var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html'};
 
 app.use(bodyParser.json());
 
 var http = require('http');
 var url = require('url');
 var querystring = require('querystring');
+
+// Port Setting
 var port = 8000;
 
-// Debugging mode
-var debug = false;
+// Debug mode ON/OFF
+var debug = true;
+var localDB = true;
+var sampleDB = true;
 
-var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html'};
 
-
-// Database for dev
+// Local database for dev
 var user_count = 0;
 var users = [];
 
@@ -67,9 +69,57 @@ function user(){
 };
 
 function addUser(user){
-	users.push(user);
-	//TODO connect database
-}
+
+	if(localDB){
+		users.push(user);
+	}
+	else{
+
+	}
+};
+
+function userFindByEmail(login_id){
+
+	if(localDB){
+		return users.find((user) => user.login_id == login_id);
+	}
+	else{
+
+	}
+
+};
+
+function userEmailFilter(userEmail){
+
+	if(localDB){
+		return users.filter((user) => user.login_id.includes(userEmail));
+	}
+	else{
+
+	}
+};
+
+function searchFollowing(u){
+
+	if(localDB){
+		return users.filter((user) => (u.following_id.find((usertemp) => usertemp.login_id == user.login_id)));
+	}
+	else{
+
+	}
+
+};
+
+function isFollowing(userEmail1, userEmail2){
+
+	if(localDB){
+		return userEmail1.following_id.find((user) => userEmail2 == user.login_id);
+	}
+	else{
+
+	}
+
+};
 
 function pet(){
 
@@ -83,18 +133,64 @@ function pet(){
 
 };
 
-function addPet(pet){
-	pets.push(pet);
-	//TODO connect database
+function addPet(owner_email, pet){
+
+	if(localDB){
+		var owner = userFindByEmail(owner_email);
+		owner.pet_id.push(pet.pet_id);
+		pets.push(pet);
+	}
+	else{
+
+	}
+};
+
+function isPetExist(pet_id){
+
+	if(localDB){
+		var e = pets.find((p) => p.pet_id == pet_id);
+		if(e)
+			return true;
+		else
+			return false;
+	}
+	else{
+
+	}
+
 }
 
-function dev_init(){
-	for(var i=0; i<10; i++){
-		var u = new user();
-		u.login_id = 'test' + i;
-		u.login_password = SHA256("" + i);
-		users.push(u);
+function petFindById(pet_id){
+
+	if(localDB){
+		return pets.find((p) => p.pet_id == pet_id);
 	}
+	else{
+
+	}
+
+};
+
+function ownerExist(owner){
+
+	if(localDB){
+		return users.find((user) => user.login_id == owner);
+	}
+	else{
+
+	}
+
+};
+
+function userPetArray(user){
+
+	if(localDB){
+		return pets.filter((pet) => (user.pet_id.find((id) => pet.pet_id == id)));
+	}
+	else{
+
+	}
+
 }
 
 function card(){
@@ -112,7 +208,13 @@ function card(){
 }
 
 function addCard(card){
-	cards.push(card);
+
+	if(localDB){
+		cards.push(card);
+	}
+	else{
+
+	}
 }
 
 function tag(){
@@ -124,7 +226,12 @@ function tag(){
 }
 
 function addTag(tag){
-	tags.push(tag);
+	if(localDB){
+		tags.push(tag);
+	}
+	else{
+
+	}
 }
 
 function like(){
@@ -136,7 +243,12 @@ function like(){
 }
 
 function addLike(like){
-	likes.push(like);
+	if(localDB){
+		likes.push(like);
+	}
+	else{
+
+	}
 }
 
 function comment(){
@@ -147,7 +259,12 @@ function comment(){
 }
 
 function addComment(comment){
-	comments.push(comment);
+	if(localDB){
+		comments.push(comment);
+	}
+	else{
+
+	}
 }
 
 function picture(){
@@ -157,7 +274,12 @@ function picture(){
 }
 
 function addPicture(picture){
-	pictures.push(picture);
+	if(localDB){
+		pictures.push(picture);
+	}
+	else{
+
+	}
 }
 
 function video(){
@@ -167,10 +289,25 @@ function video(){
 }
 
 function addVideo(video){
-	videos.push(video);
+	if(localDB){
+		videos.push(video);
+	}
+	else{
+
+	}
 }
 
+// Sample database creation
+function dev_init(){
 
+	for(var i=0; i<10; i++){
+		var u = new user();
+		u.login_id = 'test' + i;
+		u.login_password = SHA256("" + i);
+		users.push(u);
+	}
+
+}
 
 
 // URLs
@@ -184,16 +321,35 @@ app.post('/login', function (req, res) {
 	var login_id = req.body.email;
 	var login_password = SHA256(req.body.password);
 
-	var idFound = users.find((user) => user.login_id == login_id);
+	if(debug){
+		console.log('***********************' +
+			        '[/login] POST\n ' + 
+			        'email = ' + login_id + '\n' +
+			        'password = ' + req.body.password);
+	}
+
+	var idFound = userFindByEmail(login_id);
 
 	if(idFound){
 
 		if(idFound.login_password == login_password){
+
+			if(debug){
+				console.log('<Login Success>');
+				console.log('***********************');
+			}
+
 			res.writeHead(200, headerContent);
     		res.write('{\"token\" : \"' + SHA256(login_id + login_password) + '\"}');
     		res.end();
 		}
 		else{
+
+			if(debug){
+				console.log('Login Failed(Password not match');
+				console.log('***********************');
+			}
+
 			res.writeHead(404, headerContent);
     		res.write('Password doesn\'t match');
     		res.end();
@@ -201,6 +357,12 @@ app.post('/login', function (req, res) {
 
 	}
 	else{
+
+		if(debug){
+			console.log('Login Failed(E-mail not found)');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('User e-mail not found');
     	res.end();
@@ -216,13 +378,15 @@ app.post('/register', function (req, res) {
 
 	var login_password = SHA256(req.body.password);
 	var user_nickname = req.body.username;
-	var profile_pic_url = "";
+	var profile_pic_url = req.body.userProfileImage;
 	var sign_in_date = Date.now();
-	var intro = "";
+	var intro = req.body.userIntroduceText;
 
 	if(debug){
-		console.log('-----------------USER REGISTER------------');
-		console.log('user_id = ' + user_id+1);
+		console.log('***********************');
+		console.log('[/register] POST');
+		console.log('<USER>');
+		console.log('user_id = ' + user_id);
 		console.log('login_id = ' + login_id);
 		console.log('login_password = ' + login_password);
 		console.log('user_nickname = ' + user_nickname);
@@ -233,18 +397,18 @@ app.post('/register', function (req, res) {
 
 	var pet_name = req.body.petName;
 	var pet_id = pet_count;
-	var profile_pic_url = "";
-	var intro = "";
+	var profile_pic_url = req.body.petProfileImage;
+	var intro = req.body.petIntroduceText;
 
 	if(debug){
-		console.log('-----------------PET REGISTER-------------');
-		console.log('pet_id = ' + pet_id+1);
+		console.log('<PET>');
+		console.log('pet_id = ' + pet_id);
 		console.log('pet_name = ' + pet_name);
 		console.log('profile_pic_url = ' + profile_pic_url);
 		console.log('intro = ' + intro);
 	}
 
-	var idExist = users.find((user) => user.login_id == login_id);
+	var idExist = userFindByEmail(login_id);
 
 	if(login_id && user_nickname && login_password && pet_name){
 
@@ -265,17 +429,33 @@ app.post('/register', function (req, res) {
 
 				addPet(p);
 
+				if(debug){
+					console.log('<Register SUCCESS>');
+					console.log('***********************');
+				}
+
 				res.writeHead(200, headerContent);
 		    	res.write('{\"user_id\" : ' + user_id  + ', \"pet_id\" : ' + pet_id + ', \"success\" : True}');
 		    	res.end();
 	    	}
 	    	else{
+
+	    		if(debug){
+					console.log('Register FAILED(Email form error)');
+					console.log('***********************');
+				}
+
 	    		res.writeHead(404, headerContent);
 	    		res.write('User ID is not email-form');
 	    		res.end();
 	    	}
     	}
     	else{
+
+    		if(debug){
+				console.log('Register FAILED(Email already exists)');
+				console.log('***********************');
+			}
 
     		res.writeHead(404, headerContent);
     		res.write('Email Address already exists');
@@ -285,6 +465,12 @@ app.post('/register', function (req, res) {
 
 	}
 	else{
+
+		if(debug){
+			console.log('Register FAILED(Insufficient datum)');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('Mandatory datum are not provided');
     	res.end();
@@ -296,11 +482,17 @@ app.get('/user/:user_email', function (req, res) {
 
 	var user_email = req.params.user_email;
 
-	var u = users.find((user) => user.login_id == user_email);
+	var u = userFindByEmail(user_email);
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/user/:user_email] GET');
+		console.log('user_email = ' + user_email);
+	}
 
 	if(u){
 
-		var following = users.filter((user) => (u.following_id.find((usertemp) => usertemp.login_id == user.login_id)));
+		var following = searchFollowing(u);
 		var followingNames = '[';
 
 		following.forEach((f) => 
@@ -314,6 +506,23 @@ app.get('/user/:user_email', function (req, res) {
 		}
 		else{
 			followingNames = followingNames + ']';
+		}
+
+		if(debug){
+			console.log('<FOLLOWING FOUND>');
+			console.log('{\"user_id\" : ' + u.user_id + ', ' +
+	    		'\"email\" : \"' + u.login_id + '\", ' +
+	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
+	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
+				'\"introduceText\" : \"' + u.intro + '\", ' +
+				'\"pet_id\" : ' + u.pet_id + ', ' + 
+				'\"card_id\" : ' + u.card_id + ', ' + 
+				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
+				'\"totalPost\" : ' + u.card_id.length + ', ' +
+				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
+				'\"totalFollowed\" : ' + u.followed_id.length + ', ' +
+				'\"followingNames\" : ' + followingNames + '}');
+			console.log('***********************');
 		}
 
 	    res.writeHead(200, headerContent);
@@ -332,6 +541,12 @@ app.get('/user/:user_email', function (req, res) {
 	    res.end();
 	}
 	else{
+
+		if(debug){
+			console.log('USER NOT FOUND');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('No user is found');
     	res.end();
@@ -347,30 +562,53 @@ app.get('/user', function (req, res) {
 	var userEmail = parsedQuery.userEmail;
 	var userEmail2 = parsedQuery.userEmail2;
 
+	if(debug){
+		console.log('***********************');
+		console.log('[/user] GET');
+		console.log('user_email = ' + user_email);
+	}
+
 	if(!userEmail2){
 
-		var idFound = users.find((user) => user.login_id == userEmail);
+		var idFound = userFindByEmail(userEmail);
 
 		if(idFound){
+
+			if(debug){
+				console.log('<USER FOUND>');
+				console.log('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
+				console.log('***********************');
+			}
 
 			res.writeHead(200, headerContent);
 	    	res.write('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
 	    	res.end();
 		}
 		else{
+
+			if(debug){
+				console.log('USER E-MAIL NOT FOUND');
+				console.log('***********************');
+			}
+
 			res.writeHead(404, headerContent);
 	    	res.write('User e-mail not found');
 	    	res.end();
 		}
 	}
 	else{
-		var idFound = users.find((user) => user.login_id == userEmail);
+		var idFound = userFindByEmail(userEmail);
 
 		if(idFound){
 
-			var following = idFound.following_id.find((user) => userEmail2 == user.login_id);
+			var following = isFollowing(idFound, userEmail2);
 
 			if(following){
+
+				if(debug){
+					console.log('<Following True>');
+					console.log('***********************');
+				}
 
 				res.writeHead(200, headerContent);
 	    		res.write('{ \"isFollow\" : True }');
@@ -378,6 +616,11 @@ app.get('/user', function (req, res) {
 
 			}
 			else{
+
+				if(debug){
+					console.log('<Following False>');
+					console.log('***********************');
+				}
 
 				res.writeHead(200, headerContent);
 	    		res.write('{ \"isFollow\" : False }');
@@ -387,6 +630,12 @@ app.get('/user', function (req, res) {
 
 		}
 		else{
+
+			if(debug){
+				console.log('USER E-MAIL NOT FOUND');
+				console.log('***********************');
+			}
+
 			res.writeHead(404, headerContent);
 	    	res.write('userEmail is not found');
 	    	res.end();
@@ -404,7 +653,13 @@ app.get('/userFilter', function (req, res) {
 
 	var userEmail = parsedQuery.userEmail;
 
-	var idFound = users.filter((user) => user.login_id.includes(userEmail));
+	if(debug){
+		console.log('***********************');
+		console.log('[/userFilter] GET');
+		console.log('userEmail = ' + userEmail);
+	}
+
+	var idFound = userEmailFilter(userEmail);
 
 	if(idFound){
 
@@ -421,12 +676,24 @@ app.get('/userFilter', function (req, res) {
     		json = json + ']}';
     	}
 
+    	if(debug){
+    		console.log('<FILTER SUCCESS>');
+    		console.log(json);
+    		console.log('***********************');
+    	}
+
     	res.writeHead(200, headerContent);
 	    res.write(json);
 	    res.end();
 
 	}
 	else{
+
+		if(debug){
+			console.log('USER E-MAIL NOT FOUND');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('User e-mail not found');
     	res.end();
@@ -442,15 +709,33 @@ app.get('/pet', function (req, res) {
 
 	var pet_id = parsedQuery.id;
 
-	var idFound = pets.find((pet) => pet.pet_id == pet_id);
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet] GET');
+		console.log('id = ' + pet_id);
+	}
+
+	var idFound = petFindById(pet_id);
 
 	if(idFound){
+
+		if(debug){
+			console.log('<PET FOUND>');
+			console.log('{\"petProfileImage\" : \"' + idFound.profile_pic_url + '\", \"petName\" : \"' + idFound.pet_name + '\"}');
+			console.log('***********************');
+		}
 
 		res.writeHead(200, headerContent);
     	res.write('{\"petProfileImage\" : \"' + idFound.profile_pic_url + '\", \"petName\" : \"' + idFound.pet_name + '\"}');
     	res.end();
 	}
 	else{
+
+		if(debug){
+			console.log('PET NOT FOUND');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('The pet is not found');
     	res.end();
@@ -467,17 +752,25 @@ app.post('/pet', function (req, res) {
 	var introduceText = req.body.introduceText;
 	var owner = req.body.owner;
 
-	if(petName){
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet] POST');
+		console.log('petName = ' + petName);
+		console.log('owner = ' + owner);
+		console.log('petProfileImage = ' + petProfileImage);
+		console.log('petBirthDay = ' + petBirthDay);
+		console.log('introduceText = ' + introduceText);
+	}
 
-		var u = users.find((user) => user.login_id == owner);
+	if(petName && owner){
+
+		var u = ownerExist(owner);
 
 		if(u){
 
 			var p = new pet();
 			p.pet_name = petName;
 			p.owner = owner;
-
-			u.pet_id.push(p.pet_id);		
 
 			if(petProfileImage)
 				p.profile_pic_url = petProfileImage;
@@ -486,13 +779,25 @@ app.post('/pet', function (req, res) {
 			if(introduceText)
 				p.intro = introduceText;
 
-			addPet(p);
+			addPet(owner, p);
+
+			if(debug){
+				console.log('<PET CREATED>');
+				console.log('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
+				console.log('***********************');
+			}
 
 			res.writeHead(200, headerContent);
 		    res.write('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
 		    res.end();
 		}
 		else{
+
+			if(debug){
+				console.log('PET NOT FOUND(Invalid owner email)');
+				console.log('***********************');
+			}
+
 			res.writeHead(404, headerContent);
 	    	res.write('Invalid owner e-mail');
 	    	res.end();
@@ -500,8 +805,14 @@ app.post('/pet', function (req, res) {
 
 	}
 	else{
+
+		if(debug){
+			console.log('PET NOT FOUND(Insufficent datum provided(petName & owner))');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
-    	res.write('Pet\'s name is not provided');
+    	res.write('Insufficent datum provided(petName & owner)');
     	res.end();
 	}
 
@@ -509,11 +820,27 @@ app.post('/pet', function (req, res) {
 
 app.get('/pet/:pet_id', function (req, res) {
 
-	//var parsedUrl = url.parse(request.url);
-	//var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
 	var pet_id = req.params.pet_id;
 
-	if(pet_id < pet_count){
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet/:pet_id] GET');
+		console.log('pet_id = ' + pet_id);
+	}
+
+	if(isPetExist(pet_id)){
+
+		if(debug){
+			console.log('<PET FOUND>');
+			console.log('{\"id\" : ' + pets[pet_id].pet_id + ', ' +
+    			   '\"petName\" : \"' + pets[pet_id].pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + pets[pet_id].profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + pets[pet_id].pet_birthday + '\", ' +
+    			   '\"owner\" : \"' + pets[pet_id].owner + '\"}');
+			console.log('***********************');
+		}
+
+
 		res.writeHead(200, headerContent);
     	res.write('{\"id\" : ' + pets[pet_id].pet_id + ', ' +
     			   '\"petName\" : \"' + pets[pet_id].pet_name + '\", ' +
@@ -523,6 +850,12 @@ app.get('/pet/:pet_id', function (req, res) {
     	res.end();
 	}
 	else{
+
+		if(debug){
+			console.log('PET NOT FOUND');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('No pet is found');
     	res.end();
@@ -539,6 +872,16 @@ app.post('/card', function (req, res) {
 	var title = req.body.title;
 	var text = req.body.text;
 
+	if(debug){
+		console.log('***********************');
+		console.log('[/card] POST');
+		console.log('title = ' + title);
+		console.log('pets = ' + pets);
+		console.log('text = ' + text);
+		console.log('picture = ' + pictures);
+		console.log('video = ' + videos);
+	}
+
 	if(title){
 
 		var c = new card();
@@ -549,12 +892,24 @@ app.post('/card', function (req, res) {
 
 		addCard(c);
 
+		if(debug){
+			console.log('<CARD CREATED>');
+			console.log('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+			console.log('***********************');
+		}
+
 		res.writeHead(200, headerContent);
 	    res.write('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
 	    res.end();
 
 	}
 	else{
+
+		if(debug){
+			console.log('TITLE NOT PROVIDED');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('Title is not provided');
     	res.end();
@@ -566,13 +921,19 @@ app.get('/userPet/:userEmail', function (req, res) {
 
 	var login_id = req.params.userEmail;
 
-	var idFound = users.find((user) => user.login_id == login_id);
+	if(debug){
+		console.log('***********************');
+		console.log('[/userPet/:userEmail] POST');
+		console.log('userEmail = ' + login_id);
+	}
+
+	var idFound = userFindByEmail(login_id);
 
 	if(idFound){
 
 		var json = '{\"pets\" : [';
 
-		var petFound = pets.filter((pet) => (idFound.pet_id.find((id) => pet.pet_id == id)));
+		var petFound = userPetArray(idFound); 
 
 		petFound.forEach((p) => 
 
@@ -591,12 +952,24 @@ app.get('/userPet/:userEmail', function (req, res) {
     		json = json + ']}';
     	}
 
+    	if(debug){
+			console.log('<USER\'S PET FOUND>');
+			console.log(json);
+			console.log('***********************');
+		}
+
     	res.writeHead(200, headerContent);
 	    res.write(json);
 	    res.end();
 
 	}
 	else{
+
+		if(debug){
+			console.log('NO USER FOUND');
+			console.log('***********************');
+		}
+
 		res.writeHead(404, headerContent);
     	res.write('No user is found');
     	res.end();
@@ -607,9 +980,13 @@ app.get('/userPet/:userEmail', function (req, res) {
 
 app.listen(port, function (){
 	console.log('PetStagram listening on port ' + port);
-	dev_init(); // TODO database connection
+	if(sampleDB){
+		dev_init(); // TODO database connection
+	}
 });
 
+
+// Password Encryption
 function SHA256(s){
       
         var chrsz   = 8;
