@@ -35,7 +35,7 @@ set `var sampleDB = true` in line 28 petStagram.js
 JSON format http request available
 GET/POST/PUT/DELETE
 
-[CAUTION]
+[**CAUTION**]  
 The reponse value doesn't have double quotation mark("") except String value  
 However, request MUST have it for all key & value   
 

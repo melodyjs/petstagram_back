@@ -66,6 +66,7 @@ function user(){
 	this.profile_pic_url = "";
 	this.sign_in_date = "";
 	this.pet_id = [];
+	this.card_id = [];
 	this.following_id = [];
 	this.followed_id = [];
 	this.intro = "";
@@ -81,6 +82,46 @@ function addUser(user){
 
 	}
 };
+
+function modifyUser(userEmail, login_id, login_password, user_nickname, profile_pic_url, intro){
+
+	if(localDB){
+		var userWillModified = users.find((u) => u.login_id == userEmail);
+
+		if(login_id)
+			userWillModified.login_id = login_id;
+		if(login_password)
+			userWillModified.login_password = login_password;
+		if(user_nickname)
+			userWillModified.user_nickname = user_nickname;
+		if(profile_pic_url)
+			userWillModified.profile_pic_url = profile_pic_url;		
+		if(intro)
+			userWillModified.intro = intro;
+	}
+	else{
+
+	}
+
+}
+
+function deleteUser(userEmail){
+
+	if(localDB){
+
+		var userWillDeleted = users.find((u) => u.login_id == userEmail);
+
+		var userWillDeleted_id = userWillDeleted.user_id;
+
+		// TODO (delete pet if no owner exists & comment & like & followed) 
+
+		users.splice(userWillDeleted_id,1);
+	}
+	else{
+
+	}
+
+}
 
 function userFindByEmail(login_id){
 
@@ -150,6 +191,30 @@ function addPet(owner_email, pet){
 
 	}
 };
+
+function deletePet(pet_id){
+
+	if(localDB){
+
+		var petWillDeleted = pets.find((p) => p.pet_id == pet_id);
+
+		petWillDeleted.card_id.forEach((c) =>
+			deleteCard(c)
+		);
+
+		var owners = users.filter((u) => (u.pet_id.find((p) => p == pet_id)));
+
+		owners.forEach((u) =>
+			u.pet_id = u.pet_id.filter((p) => p != pet_id)
+		);
+
+		pets.splice(pet_id,1);
+	}
+	else{
+
+	}
+
+}
 
 function isPetExist(pet_id){
 
@@ -225,6 +290,40 @@ function addCard(card){
 	}
 }
 
+function deleteCard(card_id){
+
+	if(localDB){
+
+		var cardWillDeleted = cards.find((c) => c.card_id == card_id);
+
+		cardWillDeleted.tag_id.forEach((t) =>
+			deleteTag(t)
+		);
+
+		cardWillDeleted.comment_id.forEach((c) =>
+			deleteComment(c)
+		);
+
+		cardWillDeleted.like_id.forEach((l) =>
+			deleteLike(l)
+		);
+
+		cardWillDeleted.picture_id.forEach((p) =>
+			deletePicture(p)
+		);
+
+		cardWillDeleted.video_id.forEach((v) =>
+			deleteVideo(v)
+		);
+
+		pets.splice(card_id,1);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Tag
 function tag(){
@@ -242,6 +341,17 @@ function addTag(tag){
 	else{
 
 	}
+}
+
+function deleteTag(tag_id){
+
+	if(localDB){
+		tags.splice(tag_id,1);
+	}
+	else{
+
+	}
+
 }
 
 
@@ -263,6 +373,17 @@ function addLike(like){
 	}
 }
 
+function deleteLike(like_id){
+
+	if(localDB){
+		likes.splice(like_id,1);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Comment
 function comment(){
@@ -279,6 +400,17 @@ function addComment(comment){
 	else{
 
 	}
+}
+
+function deleteComment(comment_id){
+
+	if(localDB){
+		comments.splice(comment_id,1);
+	}
+	else{
+
+	}
+
 }
 
 
@@ -298,6 +430,17 @@ function addPicture(picture){
 	}
 }
 
+function deletePicture(picture_id){
+
+	if(localDB){
+		pictures.splice(picture_id,1);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Video
 function video(){
@@ -313,6 +456,17 @@ function addVideo(video){
 	else{
 
 	}
+}
+
+function deleteVideo(video_id){
+
+	if(localDB){
+		videos.splice(video_id,1);
+	}
+	else{
+
+	}
+
 }
 
 
