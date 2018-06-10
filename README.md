@@ -1,6 +1,8 @@
-# petstagram_back
+# Petstagram_back
 Web site
-petstagram backend code
+Petstagram backend code
+
+See [**Petstagram**](https://github.com/psi9730/pet-stagram) frontend
 
 Node.js used
 
