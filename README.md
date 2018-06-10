@@ -9,7 +9,7 @@ Node.js used
 ## Usage
 1. Install node.js and express
 
-2. Download server file from github
+2. Clone petstagram server file from github
 
 `git clone https://github.com/melodyjs/petstagram_back.git`
 
@@ -19,9 +19,9 @@ Node.js used
 
 `node petStagram.js`
 
-5. Server will be running on port 3000
+5. Server will be running on port 8000
 
-## Modes
+## Dev Modes
 1. Debugging log  
 set `var debug = true` in line 26 petStagram.js
 
@@ -36,12 +36,12 @@ JSON format http request available
 GET/POST/PUT/DELETE
 
 [CAUTION]
-The reponse doesn't have double quotation mark("")
-However, Request MUST have it. 
+The reponse value doesn't have double quotation mark("") except String value  
+However, request MUST have it for all key & value   
 
 ### /login  
 - [POST]  
-  body  
+  request body  
   {  
     "email" : "example@petstagram.com",  
     "password" : "example"  
@@ -49,12 +49,12 @@ However, Request MUST have it.
   
 - response  
   {  
-    token : 90kadjkf1la0aj3k2aopsdfp  
+    "token" : "90kadjkf1la0aj3k2aopsdfp"  
    }  
   
 ### /register  
 - [POST]  
-  body  
+  request body  
   {  
     "email" : "example@petstagram.com",  
     "password" : "example",  
@@ -62,11 +62,11 @@ However, Request MUST have it.
     "petName" : "example"  
   }  
   
-- respose  
+- response  
   {  
-      user_id : 123,  
-      pet_id : 231,  
-      success : true  
+      "user_id" : 123,  
+      "pet_id" : 231,  
+      "success" : true  
   }  
   
 ### /user/:user_id  
@@ -75,18 +75,18 @@ However, Request MUST have it.
   
 - response  
   {  
-      user_id : 123,  
-      email : example@petstagram.com,  
-      username : example,  
-      userProfileImage : www.example.com/pic,  
-      introduceText : hello world,  
-      pet_id : 231,  
-      card_id : [93812, 102933, 123828],  
-      userBirthDay : YYYYMMDD,  
-      totalPost : 3,  
-      totalFollowing : 217,  
-      totalFollowed : 102,  
-      followingNames : [James, Sally, Hong]  
+      "user_id" : 123,  
+      "email" : "example@petstagram.com",  
+      "username" : "example",  
+      "userProfileImage" : "www.example.com/pic",  
+      "introduceText" : "hello world",  
+      "pet_id" : 231,  
+      "card_id" : [93812, 102933, 123828],  
+      "userBirthDay" : YYYYMMDD,  
+      "totalPost" : 3,  
+      "totalFollowing" : 217,  
+      "totalFollowed" : 102,  
+      "followingNames" : ["James", "Sally", "Hong"]  
   }  
   
 ### /user  
@@ -95,9 +95,9 @@ However, Request MUST have it.
   
 - response  
   {  
-      userProfileImage : www.example.com/pic,  
-      userEmail : example@petstagram.com,  
-      introduceText : hello world  
+      "userProfileImage" : "www.example.com/pic",  
+      "userEmail" : "example@petstagram.com",  
+      "introduceText" : "hello world"  
   }  
   
 ### /userFilter  
@@ -106,8 +106,8 @@ However, Request MUST have it.
   
 - reponse  
   {  
-      num : 3,  
-      result : [example, example1, example3]  
+      "num" : 3,  
+      "result" : ["example", "example1", "example3"]  
   }  
   
 ### /pet  
@@ -116,28 +116,28 @@ However, Request MUST have it.
   
 - response  
   {  
-      petProfileImage : www.example.com/pic,  
-      petName : examplePet  
+      "petProfileImage" : "www.example.com/pic",  
+      "petName" : "examplePet" 
   }  
   
 - [POST]  
-  body  
+  request body  
   {  
       "petName" : "examplePet"  
   }  
   
 - response  
   {  
-      pet_id : 231,  
-      success : true  
+      "pet_id" : 231,  
+      "success" : True  
   }  
 
 ### /pet/:pet_id  
 - [GET]  
   /pet/231  
   {  
-      pet_id : 231,  
-      petName : examplePet  
+      "pet_id" : 231,  
+      "petName" : "examplePet"  
   }  
   
 

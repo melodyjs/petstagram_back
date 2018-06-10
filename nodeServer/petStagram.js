@@ -19,8 +19,10 @@ var http = require('http');
 var url = require('url');
 var querystring = require('querystring');
 
+
 // Port Setting
 var port = 8000;
+
 
 // Debug mode ON/OFF
 var debug = true;
@@ -53,6 +55,8 @@ var pictures = [];
 var video_count = 0;
 var videos = [];
 
+
+// Class & function for User
 function user(){
 
 	this.user_id = user_count++;
@@ -121,6 +125,8 @@ function isFollowing(userEmail1, userEmail2){
 
 };
 
+
+// Class & function for Pet
 function pet(){
 
 	this.pet_id = pet_count++;
@@ -193,6 +199,8 @@ function userPetArray(user){
 
 }
 
+
+// Class & function for Card
 function card(){
 
 	this.card_id = card_count++;
@@ -217,6 +225,8 @@ function addCard(card){
 	}
 }
 
+
+// Class & function for Tag
 function tag(){
 
 	this.tag_id = tag_count++;
@@ -234,6 +244,8 @@ function addTag(tag){
 	}
 }
 
+
+// Class & function for Like
 function like(){
 
 	this.like_id = like_count++;
@@ -251,6 +263,8 @@ function addLike(like){
 	}
 }
 
+
+// Class & function for Comment
 function comment(){
 	this.comment_id = comment_count++;
 	this.text = "";
@@ -267,6 +281,8 @@ function addComment(comment){
 	}
 }
 
+
+// Class & function for Picture
 function picture(){
 	this.picture_id = picture_count++;
 	this.picture_url = "";
@@ -282,6 +298,8 @@ function addPicture(picture){
 	}
 }
 
+
+// Class & function for Video
 function video(){
 	this.video_id = video_count++;
 	this.video_url = "";
@@ -296,6 +314,7 @@ function addVideo(video){
 
 	}
 }
+
 
 // Sample database creation
 function dev_init(){
