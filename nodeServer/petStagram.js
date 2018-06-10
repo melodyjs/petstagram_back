@@ -6,6 +6,11 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use(bodyParser.json());
 
 var http = require('http');
@@ -70,6 +75,7 @@ function pet(){
 	this.profile_pic_url = "";
 	this.card_id = [];
 	this.intro = "";
+	this.pet_birthday = "";
 
 };
 
@@ -409,7 +415,7 @@ app.post('/pet', function (req, res) {
 		addPet(p);
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.send('{\"pet_id\" : \"' + p.pet_id + '\", \"success\" : True }');
+	    res.send('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
 
 	}
 	else{
@@ -435,6 +441,70 @@ app.get('/pet/:pet_id', function (req, res) {
     	res.send('No pet is found');
 	}
 
+    
+});
+
+app.post('/card', function (req, res) {
+
+	var pets = req.body.pets;
+	var pictures = req.body.picture;
+	var videos = req.body.video;
+	var title = req.body.title;
+	var text = req.body.text;
+
+	if(title){
+
+		var c = new card();
+		c.title = title;
+		c.text = text;
+
+		//TODO picture & video save
+
+		addCard(c);
+
+		res.writeHead(200, {'Content-Type': 'text/html'});
+	    res.send('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.send('Title is not provided');
+	}
+
+});
+
+app.get('/userPet/:userEmail', function (req, res) {
+
+	var login_id = req.params.userEmail;
+
+	var idFound = users.find((user) => user.login_id == login_id);
+
+	if(idFound){
+
+		var json = '{\"pets\" : [';
+
+		var petFound = pets.filter((pet) => (idFound.pet_id.find((id) => pet.pet_id == id)));
+
+		petFound.forEach((p) => 
+
+			json = json + '{ \"petProfileImage\" : \"' + p.profile_pic_url + '\",' +
+							'\"petName\" : \"' +  p.pet_name + '\", ' +
+							'\"id\" : ' +  p.pet_id + ', ' +
+							'\"petBirthDay\" : \"' +  p.pet_birthday + '\", ' +
+							'\"introduceText\" : \"' +  p.intro + '\", ' + 
+							'\"owner\" : \"' +  p.user_id + '\" },'
+    	)
+
+    	json = json.substring(0, json.length-1) + ']}';
+
+    	res.writeHead(200, {'Content-Type': 'text/html'});
+	    res.send(json);
+
+	}
+	else{
+		res.writeHead(404, {'Content-Type': 'text/html'});
+    	res.send('No user is found');
+	}
     
 });
 
