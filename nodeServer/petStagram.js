@@ -6,10 +6,12 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
 
 app.use(bodyParser.json());
 
@@ -20,6 +22,8 @@ var port = 8000;
 
 // Debugging mode
 var debug = false;
+
+var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html'};
 
 
 // Database for dev
@@ -171,7 +175,7 @@ function addVideo(video){
 
 // URLs
 app.get('/', function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.writeHead(200, headerContent);
     res.end('Hello World!');
 });
 
@@ -185,18 +189,21 @@ app.post('/login', function (req, res) {
 	if(idFound){
 
 		if(idFound.login_password == login_password){
-			res.writeHead(200, {'Content-Type': 'text/html'});
-    		res.send('{\"token\" : \"' + SHA256(login_id + login_password) + '\"}');
+			res.writeHead(200, headerContent);
+    		res.write('{\"token\" : \"' + SHA256(login_id + login_password) + '\"}');
+    		res.end();
 		}
 		else{
-			res.writeHead(404, {'Content-Type': 'text/html'});
-    		res.send('Password doesn\'t match');
+			res.writeHead(404, headerContent);
+    		res.write('Password doesn\'t match');
+    		res.end();
 		}
 
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('User e-mail not found');
+		res.writeHead(404, headerContent);
+    	res.write('User e-mail not found');
+    	res.end();
 	}
 
     
@@ -237,61 +244,97 @@ app.post('/register', function (req, res) {
 		console.log('intro = ' + intro);
 	}
 
+	var idExist = users.find((user) => user.login_id == login_id);
+
 	if(login_id && user_nickname && login_password && pet_name){
 
-		if(login_id.includes('@')){
+		if(!idExist){
 
-			var u = new user();
-			u.user_id = user_id;
-			u.login_id = login_id;
-			u.login_password = login_password;
-			u.sign_in_date = sign_in_date;
+			if(login_id.includes('@')){
 
-			addUser(u);
+				var u = new user();
+				u.user_id = user_id;
+				u.login_id = login_id;
+				u.login_password = login_password;
+				u.sign_in_date = sign_in_date;
 
-			var p = new pet();
-			p.pet_name = pet_name;
+				addUser(u);
 
-			addPet(p);
+				var p = new pet();
+				p.pet_name = pet_name;
 
-			res.writeHead(200, {'Content-Type': 'text/html'});
-	    	res.send('{\"user_id\" : \"' + user_id  + '\", \"pet_id\" : \"' + pet_id + '\", \"success\" : True}');
+				addPet(p);
+
+				res.writeHead(200, headerContent);
+		    	res.write('{\"user_id\" : ' + user_id  + ', \"pet_id\" : ' + pet_id + ', \"success\" : True}');
+		    	res.end();
+	    	}
+	    	else{
+	    		res.writeHead(404, headerContent);
+	    		res.write('User ID is not email-form');
+	    		res.end();
+	    	}
     	}
     	else{
-    		res.writeHead(404, {'Content-Type': 'text/html'});
-    		res.send('User ID is not email-form');
+
+    		res.writeHead(404, headerContent);
+    		res.write('Email Address already exists');
+    		res.end();
+
     	}
 
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('Mandatory datum are not provided');
+		res.writeHead(404, headerContent);
+    	res.write('Mandatory datum are not provided');
+    	res.end();
 	}
     
 });
 
-app.get('/user/:user_id', function (req, res) {
+app.get('/user/:user_email', function (req, res) {
 
-	var user_id = req.params.user_id;
+	var user_email = req.params.user_email;
 
-	if(user_id < user_count){
-	    res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.send('{\"user_id\" : ' + users[user_id].user_id + ', ' +
-	    		'\"email\" : \"' + users[user_id].login_id + '\", ' +
-	    		'\"username\" : \"' + users[user_id].user_nickname + '\", ' + 
-	    		'\"userProfileImage\" : \"' + users[user_id].profile_pic_url + '\", ' + 
-				'\"introduceText\" : \"' + users[user_id].intro + '\", ' +
-				'\"pet_id\" : ' + 'NOT IMPLEMENTED' + ', ' + 
-				'\"card_id\" : ' + 'NOT IMPLEMENTED' + ', ' + 
-				'\"userBirthDay\" : \"' + 'NOT IMPLEMENTED' + '\", ' + 
-				'\"totalPost\" : ' + 'NOT IMPLEMENTED' + ', ' +
-				'\"totalFollowing\" : ' + 'NOT IMPLEMENTED' + ', ' +
-				'\"totalFollowed\" : ' + 'NOT IMPLEMENTED' + ', ' +
-				'\"followingNames\" : \"' + 'NOT IMPLEMENTED' + '\"}');
+	var u = users.find((user) => user.login_id == user_email);
+
+	if(u){
+
+		var following = users.filter((user) => (u.following_id.find((usertemp) => usertemp.login_id == user.login_id)));
+		var followingNames = '[';
+
+		following.forEach((f) => 
+
+			followingNames = followingNames + '\"' + f.user_nickname + '\",'
+
+		);
+
+		if(following.length > 0){
+			followingNames = followingNames.substring(0, json.length-1) + ']';
+		}
+		else{
+			followingNames = followingNames + ']';
+		}
+
+	    res.writeHead(200, headerContent);
+	    res.write('{\"user_id\" : ' + u.user_id + ', ' +
+	    		'\"email\" : \"' + u.login_id + '\", ' +
+	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
+	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
+				'\"introduceText\" : \"' + u.intro + '\", ' +
+				'\"pet_id\" : ' + u.pet_id + ', ' + 
+				'\"card_id\" : ' + u.card_id + ', ' + 
+				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
+				'\"totalPost\" : ' + u.card_id.length + ', ' +
+				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
+				'\"totalFollowed\" : ' + u.followed_id.length + ', ' +
+				'\"followingNames\" : ' + followingNames + '}');
+	    res.end();
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('No user is found');
+		res.writeHead(404, headerContent);
+    	res.write('No user is found');
+    	res.end();
 	}
 
 });
@@ -310,13 +353,14 @@ app.get('/user', function (req, res) {
 
 		if(idFound){
 
-			res.writeHead(200, {'Content-Type': 'text/html'});
-	    	res.send('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
-
+			res.writeHead(200, headerContent);
+	    	res.write('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
+	    	res.end();
 		}
 		else{
-			res.writeHead(404, {'Content-Type': 'text/html'});
-	    	res.send('User e-mail not found');
+			res.writeHead(404, headerContent);
+	    	res.write('User e-mail not found');
+	    	res.end();
 		}
 	}
 	else{
@@ -328,21 +372,24 @@ app.get('/user', function (req, res) {
 
 			if(following){
 
-				res.writeHead(200, {'Content-Type': 'text/html'});
-	    		res.send('{ \"isFollow\" : True }');
+				res.writeHead(200, headerContent);
+	    		res.write('{ \"isFollow\" : True }');
+	    		res.end();
 
 			}
 			else{
 
-				res.writeHead(200, {'Content-Type': 'text/html'});
-	    		res.send('{ \"isFollow\" : False }');
+				res.writeHead(200, headerContent);
+	    		res.write('{ \"isFollow\" : False }');
+	    		res.end();
 
 			}
 
 		}
 		else{
-			res.writeHead(404, {'Content-Type': 'text/html'});
-	    	res.send('userEmail is not found');
+			res.writeHead(404, headerContent);
+	    	res.write('userEmail is not found');
+	    	res.end();
 		}
 
 	}
@@ -367,15 +414,22 @@ app.get('/userFilter', function (req, res) {
 			json = json + '\"' + u.login_id + '\", '
     	)
 
-    	json = json.substring(0, json.length-2) + ']}';
+		if(idFound.length > 0){
+    		json = json.substring(0, json.length-2) + ']}';
+    	}
+    	else{
+    		json = json + ']}';
+    	}
 
-    	res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.send(json);
+    	res.writeHead(200, headerContent);
+	    res.write(json);
+	    res.end();
 
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('User e-mail not found');
+		res.writeHead(404, headerContent);
+    	res.write('User e-mail not found');
+    	res.end();
 	}
 
 
@@ -392,12 +446,14 @@ app.get('/pet', function (req, res) {
 
 	if(idFound){
 
-		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.send('{\"petProfileImage\" : \"' + idFound.profile_pic_url + '\", \"petName\" : \"' + idFound.pet_name + '\"}');
+		res.writeHead(200, headerContent);
+    	res.write('{\"petProfileImage\" : \"' + idFound.profile_pic_url + '\", \"petName\" : \"' + idFound.pet_name + '\"}');
+    	res.end();
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('The pet is not found');
+		res.writeHead(404, headerContent);
+    	res.write('The pet is not found');
+    	res.end();
 	}
 
 
@@ -406,21 +462,47 @@ app.get('/pet', function (req, res) {
 app.post('/pet', function (req, res) {
 
 	var petName = req.body.petName;
+	var petProfileImage = req.body.petProfileImage;
+	var petBirthDay = req.body.petBirthDay;
+	var introduceText = req.body.introduceText;
+	var owner = req.body.owner;
 
 	if(petName){
 
-		var p = new pet();
-		p.pet_name = petName;
+		var u = users.find((user) => user.login_id == owner);
 
-		addPet(p);
+		if(u){
 
-		res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.send('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
+			var p = new pet();
+			p.pet_name = petName;
+			p.owner = owner;
+
+			u.pet_id.push(p.pet_id);		
+
+			if(petProfileImage)
+				p.profile_pic_url = petProfileImage;
+			if(petBirthDay)
+				p.pet_birthday = petBirthDay;
+			if(introduceText)
+				p.intro = introduceText;
+
+			addPet(p);
+
+			res.writeHead(200, headerContent);
+		    res.write('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
+		    res.end();
+		}
+		else{
+			res.writeHead(404, headerContent);
+	    	res.write('Invalid owner e-mail');
+	    	res.end();
+		}
 
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('Pet\'s name is not provided');
+		res.writeHead(404, headerContent);
+    	res.write('Pet\'s name is not provided');
+    	res.end();
 	}
 
 });
@@ -432,13 +514,18 @@ app.get('/pet/:pet_id', function (req, res) {
 	var pet_id = req.params.pet_id;
 
 	if(pet_id < pet_count){
-		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.send('{\"pet_id\" : ' + pets[pet_id].pet_id + ', ' +
-    		'\"petName\" : \"' + pets[pet_id].pet_name + '\"}');
+		res.writeHead(200, headerContent);
+    	res.write('{\"id\" : ' + pets[pet_id].pet_id + ', ' +
+    			   '\"petName\" : \"' + pets[pet_id].pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + pets[pet_id].profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + pets[pet_id].pet_birthday + '\", ' +
+    			   '\"owner\" : \"' + pets[pet_id].owner + '\"}');
+    	res.end();
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('No pet is found');
+		res.writeHead(404, headerContent);
+    	res.write('No pet is found');
+    	res.end();
 	}
 
     
@@ -462,13 +549,15 @@ app.post('/card', function (req, res) {
 
 		addCard(c);
 
-		res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.send('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+		res.writeHead(200, headerContent);
+	    res.write('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+	    res.end();
 
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('Title is not provided');
+		res.writeHead(404, headerContent);
+    	res.write('Title is not provided');
+    	res.end();
 	}
 
 });
@@ -495,15 +584,22 @@ app.get('/userPet/:userEmail', function (req, res) {
 							'\"owner\" : \"' +  p.user_id + '\" },'
     	)
 
-    	json = json.substring(0, json.length-1) + ']}';
+		if(petFound.length > 0){
+    		json = json.substring(0, json.length-1) + ']}';
+    	}
+    	else{
+    		json = json + ']}';
+    	}
 
-    	res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.send(json);
+    	res.writeHead(200, headerContent);
+	    res.write(json);
+	    res.end();
 
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('No user is found');
+		res.writeHead(404, headerContent);
+    	res.write('No user is found');
+    	res.end();
 	}
     
 });
