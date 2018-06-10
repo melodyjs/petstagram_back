@@ -24,6 +24,24 @@ var users = [];
 var pet_count = 0;
 var pets = [];
 
+var card_count = 0;
+var cards = [];
+
+var tag_count = 0;
+var tags = [];
+
+var like_count = 0;
+var likes = [];
+
+var comment_count = 0;
+var comments = [];
+
+var picture_count = 0;
+var pictures = [];
+
+var video_count = 0;
+var videos = [];
+
 function user(){
 
 	this.user_id = user_count++;
@@ -32,6 +50,9 @@ function user(){
 	this.user_nickname = "";
 	this.profile_pic_url = "";
 	this.sign_in_date = "";
+	this.pet_id = [];
+	this.following_id = [];
+	this.followed_id = [];
 	this.intro = "";
 
 };
@@ -44,8 +65,10 @@ function addUser(user){
 function pet(){
 
 	this.pet_id = pet_count++;
+	this.user_id = 0;
 	this.pet_name = "";
 	this.profile_pic_url = "";
+	this.card_id = [];
 	this.intro = "";
 
 };
@@ -63,6 +86,80 @@ function dev_init(){
 		users.push(u);
 	}
 }
+
+function card(){
+
+	this.card_id = card_count++;
+	this.date = Date.now();
+	this.location = "";
+	this.text = "";
+	this.tag_id = [];
+	this.like_id = [];
+	this.comment_id = [];
+	this.video_id = [];
+	this.picture_id = [];
+
+}
+
+function addCard(card){
+	cards.push(card);
+}
+
+function tag(){
+
+	this.tag_id = tag_count++;
+	this.used_number = 0;
+	this.tag_text = "";
+
+}
+
+function addTag(tag){
+	tags.push(tag);
+}
+
+function like(){
+
+	this.like_id = like_count++;
+	this.date = Date.now();
+	this.user_id = 0;
+
+}
+
+function addLike(like){
+	likes.push(like);
+}
+
+function comment(){
+	this.comment_id = comment_count++;
+	this.text = "";
+	this.date = Date.now();
+	this.user_id = 0;
+}
+
+function addComment(comment){
+	comments.push(comment);
+}
+
+function picture(){
+	this.picture_id = picture_count++;
+	this.picture_url = "";
+	this.size = 0;
+}
+
+function addPicture(picture){
+	pictures.push(picture);
+}
+
+function video(){
+	this.video_id = video_count++;
+	this.video_url = "";
+	this.size = 0;
+}
+
+function addVideo(video){
+	videos.push(video);
+}
+
 
 
 
@@ -83,17 +180,17 @@ app.post('/login', function (req, res) {
 
 		if(idFound.login_password == login_password){
 			res.writeHead(200, {'Content-Type': 'text/html'});
-    		res.end('{token : ' + SHA256(login_id + login_password) + '}');
+    		res.send('{\"token\" : \"' + SHA256(login_id + login_password) + '\"}');
 		}
 		else{
 			res.writeHead(404, {'Content-Type': 'text/html'});
-    		res.end('Password doesn\'t match');
+    		res.send('Password doesn\'t match');
 		}
 
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('User e-mail not found');
+    	res.send('User e-mail not found');
 	}
 
     
@@ -152,17 +249,17 @@ app.post('/register', function (req, res) {
 			addPet(p);
 
 			res.writeHead(200, {'Content-Type': 'text/html'});
-	    	res.end('{user_id : ' + user_id  + ', pet_id :' + pet_id + ', success : true}');
+	    	res.send('{\"user_id\" : \"' + user_id  + '\", \"pet_id\" : \"' + pet_id + '\", \"success\" : True}');
     	}
     	else{
     		res.writeHead(404, {'Content-Type': 'text/html'});
-    		res.end('User ID is not email-form');
+    		res.send('User ID is not email-form');
     	}
 
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('Mandatory datum are not provided');
+    	res.send('Mandatory datum are not provided');
 	}
     
 });
@@ -173,22 +270,22 @@ app.get('/user/:user_id', function (req, res) {
 
 	if(user_id < user_count){
 	    res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.end('{user_id : ' + users[user_id].user_id + ', ' +
-	    		'email : ' + users[user_id].login_id + ', ' +
-	    		'username : ' + users[user_id].user_nickname + ', ' + 
-	    		'userProfileImage : ' + users[user_id].profile_pic_url + ', ' + 
-				'introduceText : ' + users[user_id].intro + ', ' +
-				'pet_id : ' + 'NOT IMPLEMENTED' + ', ' + 
-				'card_id : ' + 'NOT IMPLEMENTED' + ', ' + 
-				'userBirthDay : ' + 'NOT IMPLEMENTED' + ', ' + 
-				'totalPost : ' + 'NOT IMPLEMENTED' + ', ' +
-				'totalFollowing : ' + 'NOT IMPLEMENTED' + ', ' +
-				'totalFollowed : ' + 'NOT IMPLEMENTED' + ', ' +
-				'followingNames : ' + 'NOT IMPLEMENTED' + '}');
+	    res.send('{\"user_id\" : ' + users[user_id].user_id + ', ' +
+	    		'\"email\" : \"' + users[user_id].login_id + '\", ' +
+	    		'\"username\" : \"' + users[user_id].user_nickname + '\", ' + 
+	    		'\"userProfileImage\" : \"' + users[user_id].profile_pic_url + '\", ' + 
+				'\"introduceText\" : \"' + users[user_id].intro + '\", ' +
+				'\"pet_id\" : ' + 'NOT IMPLEMENTED' + ', ' + 
+				'\"card_id\" : ' + 'NOT IMPLEMENTED' + ', ' + 
+				'\"userBirthDay\" : \"' + 'NOT IMPLEMENTED' + '\", ' + 
+				'\"totalPost\" : ' + 'NOT IMPLEMENTED' + ', ' +
+				'\"totalFollowing\" : ' + 'NOT IMPLEMENTED' + ', ' +
+				'\"totalFollowed\" : ' + 'NOT IMPLEMENTED' + ', ' +
+				'\"followingNames\" : \"' + 'NOT IMPLEMENTED' + '\"}');
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('No user is found');
+    	res.send('No user is found');
 	}
 
 });
@@ -205,12 +302,12 @@ app.get('/user', function (req, res) {
 	if(idFound){
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('{userProfileImage : ' + idFound.profile_pic_url + ', userEmail : ' + userEmail + ', introduceText : ' + idFound.intro + '}');
+    	res.send('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
 
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('User e-mail not found');
+    	res.send('User e-mail not found');
 	}
 
 
@@ -227,7 +324,7 @@ app.get('/userFilter', function (req, res) {
 
 	if(idFound){
 
-		var json = '{num:' + idFound.length + ', result : [';
+		var json = '{\"num\":' + idFound.length + ', \"result\" : [';
 
 		idFound.forEach((u) => 
 			json = json + '\"' + u.login_id + '\", '
@@ -236,12 +333,12 @@ app.get('/userFilter', function (req, res) {
     	json = json.substring(0, json.length-2) + ']}';
 
     	res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.end(json);
+	    res.send(json);
 
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('User e-mail not found');
+    	res.send('User e-mail not found');
 	}
 
 
@@ -259,11 +356,11 @@ app.get('/pet', function (req, res) {
 	if(idFound){
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('{petProfileImage : ' + idFound.profile_pic_url + ', petName : ' + idFound.pet_name + '}');
+    	res.send('{\"petProfileImage\" : \"' + idFound.profile_pic_url + '\", \"petName\" : \"' + idFound.pet_name + '\"}');
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('The pet is not found');
+    	res.send('The pet is not found');
 	}
 
 
@@ -281,12 +378,12 @@ app.post('/pet', function (req, res) {
 		addPet(p);
 
 		res.writeHead(200, {'Content-Type': 'text/html'});
-	    res.end('{pet_id :' + p.pet_id + ', success : true}');
+	    res.send('{\"pet_id\" : \"' + p.pet_id + '\", \"success\" : True }');
 
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('Pet\'s name is not provided');
+    	res.send('Pet\'s name is not provided');
 	}
 
 });
@@ -299,12 +396,12 @@ app.get('/pet/:pet_id', function (req, res) {
 
 	if(pet_id < pet_count){
 		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.end('{pet_id : ' + pets[pet_id].pet_id + ', ' +
-    		'petName = ' + pets[pet_id].pet_name + '}');
+    	res.send('{\"pet_id\" : ' + pets[pet_id].pet_id + ', ' +
+    		'\"petName\" : \"' + pets[pet_id].pet_name + '\"}');
 	}
 	else{
 		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.end('No pet is found');
+    	res.send('No pet is found');
 	}
 
     
