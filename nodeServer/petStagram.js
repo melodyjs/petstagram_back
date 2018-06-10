@@ -981,7 +981,7 @@ app.get('/userPet/:userEmail', function (req, res) {
 app.listen(port, function (){
 	console.log('PetStagram listening on port ' + port);
 	if(sampleDB){
-		dev_init(); // TODO database connection
+		dev_init(); 
 	}
 });
 
