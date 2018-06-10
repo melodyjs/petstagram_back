@@ -296,18 +296,49 @@ app.get('/user', function (req, res) {
 	var parsedQuery = querystring.parse(parsedUrl.query,'&','=');
 
 	var userEmail = parsedQuery.userEmail;
+	var userEmail2 = parsedQuery.userEmail2;
 
-	var idFound = users.find((user) => user.login_id == userEmail);
+	if(!userEmail2){
 
-	if(idFound){
+		var idFound = users.find((user) => user.login_id == userEmail);
 
-		res.writeHead(200, {'Content-Type': 'text/html'});
-    	res.send('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
+		if(idFound){
 
+			res.writeHead(200, {'Content-Type': 'text/html'});
+	    	res.send('{\"userProfileImage\" : \"' + idFound.profile_pic_url + '\", \"userEmail\" : \"' + userEmail + '\", \"introduceText\" : \"' + idFound.intro + '\"}');
+
+		}
+		else{
+			res.writeHead(404, {'Content-Type': 'text/html'});
+	    	res.send('User e-mail not found');
+		}
 	}
 	else{
-		res.writeHead(404, {'Content-Type': 'text/html'});
-    	res.send('User e-mail not found');
+		var idFound = users.find((user) => user.login_id == userEmail);
+
+		if(idFound){
+
+			var following = idFound.following_id.find((user) => userEmail2 == user.login_id);
+
+			if(following){
+
+				res.writeHead(200, {'Content-Type': 'text/html'});
+	    		res.send('{ \"isFollow\" : True }');
+
+			}
+			else{
+
+				res.writeHead(200, {'Content-Type': 'text/html'});
+	    		res.send('{ \"isFollow\" : False }');
+
+			}
+
+		}
+		else{
+			res.writeHead(404, {'Content-Type': 'text/html'});
+	    	res.send('userEmail is not found');
+		}
+
 	}
 
 
