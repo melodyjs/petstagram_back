@@ -113,13 +113,59 @@ function deleteUser(userEmail){
 
 		var userWillDeleted_id = userWillDeleted.user_id;
 
-		// TODO (delete pet if no owner exists & comment & like & followed) 
+		userWillDeleted.pet_id.forEach((p_i) =>{
 
-		users.splice(userWillDeleted_id,1);
+			var userPet = pets.filter((p) => p.pet_id == p_i);
+			userPet.forEach((p) => {
+				if(p.owners.length == 1){
+					deletePet(p.pet_id);
+				}
+				else{
+					petOwnerDelete(p.pet_id, userEmail);
+				}
+			});
+
+		});
+
+		comments.filter((c) => c.user_email == userEmail).forEach((c) => {
+			deleteComment(c.comment_id);
+		});
+
+		likes.filter((l) => l.user_email == userEmail).forEach((l) => {
+			deleteLike(l.like_id);
+		});
+
+		var followedUsers = users.filter((u) => (u.followed_id.find((f_i) => f_i == userEmail)));
+
+		followedUsers.forEach((u) => {
+			unfollow(userEmail, u.login_id);
+		});
+
+		users = users.filter((u) => u.user_id != userEmail);
 	}
 	else{
 
 	}
+
+}
+
+function follow(userEmail1, userEmail2){
+
+	var user1 = users.find((u) => u.login_id == userEmail1);
+	var user2 = users.find((u) => u.login_id == userEmail2);
+
+	user1.following_id.push(userEmail2);
+	user2.followed_id.push(userEmail1);
+
+}
+
+function unfollow(userEmail1, userEmail2){
+
+	var user1 = users.find((u) => u.login_id == userEmail1);
+	var user2 = users.find((u) => u.login_id == userEmail2);
+
+	user1.following_id = user1.following_id.filter((u_i) => u_i != userEmail2);
+	user2.followed_id = user2.followed_id.filter((u_i) => u_i != userEmail1);
 
 }
 
@@ -171,7 +217,7 @@ function isFollowing(userEmail1, userEmail2){
 function pet(){
 
 	this.pet_id = pet_count++;
-	this.user_id = 0;
+	this.owners = [];
 	this.pet_name = "";
 	this.profile_pic_url = "";
 	this.card_id = [];
@@ -192,6 +238,48 @@ function addPet(owner_email, pet){
 	}
 };
 
+function modifyPet(pet_id, pet_name, profile_pic_url, intro, pet_birthday){
+
+	if(localDB){
+
+		var petWillBeModified = pets.find((p) => p.pet_id == pet_id);
+
+		if(pet_name)
+			petWillBeModified.pet_name = pet_name;
+		if(profile_pic_url)
+			petWillBeModified.profile_pic_url = profile_pic_url;
+		if(intro)
+			petWillBeModified.intro = intro;
+		if(pet_birthday)
+			petWillBeModified.pet_birthday = pet_birthday;
+	}
+	else{
+
+	}
+
+};
+
+function petOwnerAdd(pet_id, newOwnerEmail){
+
+	if(localDB){
+		var thePet = pets.find((p) => p.pet_id == pet_id);
+		thePet.owners.push(newOwnerEmail);
+	}
+	else{
+
+	}
+
+};
+
+function petOwnerDelete(pet_id, ownerWillBeDeleted){
+
+	if(localDB){
+		var thePet = pets.find((p) => p.pet_id == pet_id);
+		thePet.owners = thePet.owners.filter((u) => u != newOwnerEmail);
+	}
+
+};
+
 function deletePet(pet_id){
 
 	if(localDB){
@@ -208,13 +296,13 @@ function deletePet(pet_id){
 			u.pet_id = u.pet_id.filter((p) => p != pet_id)
 		);
 
-		pets.splice(pet_id,1);
+		pets = pets.filter((p) => p.pet_id != pet_id);
 	}
 	else{
 
 	}
 
-}
+};
 
 function isPetExist(pet_id){
 
@@ -266,7 +354,7 @@ function userPetArray(user){
 
 
 // Class & function for Card
-function card(){
+function card(pet_id){
 
 	this.card_id = card_count++;
 	this.date = Date.now();
@@ -277,6 +365,7 @@ function card(){
 	this.comment_id = [];
 	this.video_id = [];
 	this.picture_id = [];
+	this.pet_id = pet_id;
 
 }
 
@@ -288,6 +377,25 @@ function addCard(card){
 	else{
 
 	}
+}
+
+function modifyCard(card_id, location, text, tag_id){
+
+	if(localDB){
+		var theCard = cards.find((c) => c.card_id == card_id);
+
+		if(location)
+			theCard.location = location;
+		if(text)
+			theCard.text = text;
+		if(tag_id)
+			theCard.tag_id = tag_id;
+
+	}
+	else{
+
+	}
+
 }
 
 function deleteCard(card_id){
@@ -316,7 +424,11 @@ function deleteCard(card_id){
 			deleteVideo(v)
 		);
 
-		pets.splice(card_id,1);
+		var thePet = pets.find((p) => p.pet_id == cardWillDeleted.pet_id);
+
+		thePet.card_id = thePet.card_id.filter((c) => c.card_id != card_id);
+
+		cards = cards.filter((c) => c.card_id != card_id);
 	}
 	else{
 
@@ -360,13 +472,15 @@ function like(){
 
 	this.like_id = like_count++;
 	this.date = Date.now();
-	this.user_id = 0;
+	this.user_email = 0;
+	this.card_id = 0;
 
 }
 
 function addLike(like){
 	if(localDB){
 		likes.push(like);
+		cards.find((c) => c.card_id == like.card_id).like_id.push(like.like_id);
 	}
 	else{
 
@@ -376,7 +490,15 @@ function addLike(like){
 function deleteLike(like_id){
 
 	if(localDB){
-		likes.splice(like_id,1);
+
+		var card_id = likes.find((l) => l.like_id == like_id).card_id;
+
+		likes = likes.filter((l) => l.like_id != like_id);
+
+		var cardLikes = cards.find((c) => c.card_id == card_id).like_id
+		cardLikes = cardLikes.filter((l) => l.like_id != like_id);
+
+		likes = likes.filter((l) => l.like_id != like_id);
 	}
 	else{
 
@@ -390,12 +512,14 @@ function comment(){
 	this.comment_id = comment_count++;
 	this.text = "";
 	this.date = Date.now();
-	this.user_id = 0;
+	this.user_email = 0;
+	this.card_id = 0;
 }
 
 function addComment(comment){
 	if(localDB){
 		comments.push(comment);
+		cards.find((c) => c.comment_id == comment.card_id).comment_id.push(comment.comment_id);
 	}
 	else{
 
@@ -405,7 +529,14 @@ function addComment(comment){
 function deleteComment(comment_id){
 
 	if(localDB){
-		comments.splice(comment_id,1);
+		var card_id = comments.find((c) => c.comment_id == comment_id).card_id;
+
+		comments = comments.filter((c) => c.comment_id != comment_id);
+
+		var cardComments = cards.find((c) => c.comment_id == card_id).comment_id
+		cardComments = cardComments.filter((c) => c.comment_id != comment_id);
+
+		comments = comments.filter((c) => c.comment_id != comment_id);
 	}
 	else{
 
@@ -419,11 +550,13 @@ function picture(){
 	this.picture_id = picture_count++;
 	this.picture_url = "";
 	this.size = 0;
+	this.card_id = 0;
 }
 
 function addPicture(picture){
 	if(localDB){
 		pictures.push(picture);
+		cards.find((c) => c.picture_id == picture.card_id).picture_id.push(picture.picture_id);
 	}
 	else{
 
@@ -433,7 +566,14 @@ function addPicture(picture){
 function deletePicture(picture_id){
 
 	if(localDB){
-		pictures.splice(picture_id,1);
+		var card_id = pictures.find((p) => p.picture_id == picture_id).card_id;
+
+		pictures = pictures.filter((p) => p.picture_id != picture_id);
+		
+		var cardPictures = pictures.find((p) => p.picture_id == card_id).picture_id
+		cardComments = cardComments.filter((c) => c.picture_id != picture_id);
+
+		pictures = pictures.filter((p) => p.picture_id != picture_id);
 	}
 	else{
 
@@ -447,11 +587,13 @@ function video(){
 	this.video_id = video_count++;
 	this.video_url = "";
 	this.size = 0;
+	this.card_id = 0;
 }
 
 function addVideo(video){
 	if(localDB){
 		videos.push(video);
+		cards.find((c) => c.card_id == video.card_id).video_id.push(video.video_id);
 	}
 	else{
 
@@ -461,7 +603,14 @@ function addVideo(video){
 function deleteVideo(video_id){
 
 	if(localDB){
-		videos.splice(video_id,1);
+		var card_id = videos.find((v) => v.video_id == video_id).card_id;
+
+		videos = videos.filter((v) => v.video_id != video_id);
+		
+		var cardVideos = videos.find((v) => v.video_id == card_id).video_id
+		cardVideos = cardVideos.filter((c) => c.video_id != video_id);
+
+		videos = videos.filter((v) => v.video_id != video_id);
 	}
 	else{
 
@@ -599,8 +748,10 @@ app.post('/register', function (req, res) {
 
 				var p = new pet();
 				p.pet_name = pet_name;
+				p.profile_pic_url = profile_pic_url;
+				p.intro = intro;
 
-				addPet(p);
+				addPet(login_id, p);
 
 				if(debug){
 					console.log('<Register SUCCESS>');
@@ -943,7 +1094,7 @@ app.post('/pet', function (req, res) {
 
 			var p = new pet();
 			p.pet_name = petName;
-			p.owner = owner;
+			p.owners.push(owner);
 
 			if(petProfileImage)
 				p.profile_pic_url = petProfileImage;
