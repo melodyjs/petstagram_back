@@ -66,7 +66,6 @@ function user(){
 	this.profile_pic_url = "";
 	this.sign_in_date = "";
 	this.pet_id = [];
-	this.card_id = [];
 	this.following_id = [];
 	this.followed_id = [];
 	this.intro = "";
@@ -359,6 +358,7 @@ function card(pet_id){
 	this.card_id = card_count++;
 	this.date = Date.now();
 	this.location = "";
+	this.title = "";
 	this.text = "";
 	this.tag_id = [];
 	this.like_id = [];
@@ -379,17 +379,23 @@ function addCard(card){
 	}
 }
 
-function modifyCard(card_id, location, text, tag_id){
+function modifyCard(card_id, location, title, text, tag_id, picture_id, video_id){
 
 	if(localDB){
 		var theCard = cards.find((c) => c.card_id == card_id);
 
 		if(location)
 			theCard.location = location;
+		if(title)
+			theCard.title = title;
 		if(text)
 			theCard.text = text;
 		if(tag_id)
 			theCard.tag_id = tag_id;
+		if(picture_id)
+			theCard.picture_id = picture_id;
+		if(video_id)
+			theCard.video_id = video_id;
 
 	}
 	else{
@@ -436,6 +442,17 @@ function deleteCard(card_id){
 
 }
 
+function cardFindById(card_id){
+
+	if(localDB){
+		return cards.find((p) => p.card_id == card_id);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Tag
 function tag(){
@@ -468,12 +485,12 @@ function deleteTag(tag_id){
 
 
 // Class & function for Like
-function like(){
+function like(card_id){
 
 	this.like_id = like_count++;
 	this.date = Date.now();
 	this.user_email = 0;
-	this.card_id = 0;
+	this.card_id = card_id;
 
 }
 
@@ -506,14 +523,25 @@ function deleteLike(like_id){
 
 }
 
+function likeFindById(like_id){
+
+	if(localDB){
+		return likes.find((l) => l.like_id == like_id);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Comment
-function comment(){
+function comment(card_id){
 	this.comment_id = comment_count++;
 	this.text = "";
 	this.date = Date.now();
-	this.user_email = 0;
-	this.card_id = 0;
+	this.user_email = '';
+	this.card_id = card_id;
 }
 
 function addComment(comment){
@@ -524,6 +552,21 @@ function addComment(comment){
 	else{
 
 	}
+}
+
+function modifyComment(comment_id, text){
+
+	if(localDB){
+		var theCard = cards.find((c) => c.card_id == card_id);
+
+		if(text)
+			theCard.text = text;
+
+	}
+	else{
+
+	}
+
 }
 
 function deleteComment(comment_id){
@@ -544,13 +587,24 @@ function deleteComment(comment_id){
 
 }
 
+function commentFindById(comment_id){
+
+	if(localDB){
+		return comments.find((c) => c.comment_id == comment_id);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Picture
-function picture(){
+function picture(card_id){
 	this.picture_id = picture_count++;
 	this.picture_url = "";
 	this.size = 0;
-	this.card_id = 0;
+	this.card_id = card_id;
 }
 
 function addPicture(picture){
@@ -581,13 +635,24 @@ function deletePicture(picture_id){
 
 }
 
+function pictureFindById(picture_id){
+
+	if(localDB){
+		return pictures.find((p) => p.picture_id == picture_id);
+	}
+	else{
+
+	}
+
+}
+
 
 // Class & function for Video
-function video(){
+function video(card_id){
 	this.video_id = video_count++;
 	this.video_url = "";
 	this.size = 0;
-	this.card_id = 0;
+	this.card_id = card_id;
 }
 
 function addVideo(video){
@@ -709,7 +774,7 @@ app.post('/register', function (req, res) {
 		console.log('[/register] POST');
 		console.log('<USER>');
 		console.log('user_id = ' + user_id);
-		console.log('login_id = ' + login_id);
+		console.log('login_id = ' + login_id);g
 		console.log('login_password = ' + login_password);
 		console.log('user_nickname = ' + user_nickname);
 		console.log('profile_pic_url = ' + profile_pic_url);
@@ -839,8 +904,7 @@ app.get('/user/:user_email', function (req, res) {
 	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
 	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
 				'\"introduceText\" : \"' + u.intro + '\", ' +
-				'\"pet_id\" : ' + u.pet_id + ', ' + 
-				'\"card_id\" : ' + u.card_id + ', ' + 
+				'\"pet_id\" : ' + arrayToString(u.pet_id) + ', ' + 
 				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
 				'\"totalPost\" : ' + u.card_id.length + ', ' +
 				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
@@ -855,13 +919,100 @@ app.get('/user/:user_email', function (req, res) {
 	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
 	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
 				'\"introduceText\" : \"' + u.intro + '\", ' +
-				'\"pet_id\" : ' + u.pet_id + ', ' + 
-				'\"card_id\" : ' + u.card_id + ', ' + 
+				'\"pet_id\" : ' + arrayToString(u.pet_id) + ', ' +
 				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
 				'\"totalPost\" : ' + u.card_id.length + ', ' +
 				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
 				'\"totalFollowed\" : ' + u.followed_id.length + ', ' +
 				'\"followingNames\" : ' + followingNames + '}');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('USER NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No user is found');
+    	res.end();
+	}
+
+});
+
+app.put('/user/:user_email', function (req, res) {
+
+	var user_email = req.params.user_email;
+
+	var u = userFindByEmail(user_email);
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/user/:user_email] PUT');
+		console.log('user_email = ' + user_email);
+	}
+
+	if(u){
+
+		var login_id = req.body.userEmail;
+		var login_password = req.body.password;
+		var user_nickname = req.body.username;
+		var profile_pic_url = req.body.userProfileImage;
+		var intro = req.body.introduceText;
+
+		modifyUser(userEmail, login_id, login_password, user_nickname, profile_pic_url, intro);
+
+		if(debug){
+			console.log('<USER INFO MODIFIED>');
+			console.log('{\"userEmail\" : ' + login_id + ', ' +
+	    		'\"password\" : \"' + login_password + '\", ' +
+	    		'\"userProfileImage\" : \"' + user_nickname + '\", ' + 
+	    		'\"introduceText\" : \"' + intro + '\"}');
+			console.log('***********************');
+		}
+
+	    res.writeHead(200, headerContent);
+	    res.write('{\"success\" : True}');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('USER NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No user is found');
+    	res.end();
+	}
+
+});
+
+app.delete('/user/:user_email', function (req, res) {
+
+	var user_email = req.params.user_email;
+
+	var u = userFindByEmail(user_email);
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/user/:user_email] DELETE');
+		console.log('user_email = ' + user_email);
+	}
+
+	if(u){
+
+		deleteUser(user_email);
+
+		if(debug){
+			console.log('<USER DELETED>');
+			console.log('***********************');
+		}
+
+	    res.writeHead(200, headerContent);
+	    res.write('{\"success\" : True}');
 	    res.end();
 	}
 	else{
@@ -1026,6 +1177,88 @@ app.get('/userFilter', function (req, res) {
 
 });
 
+app.post('/follow', function (req, res) {
+
+	var userEmail1 = req.body.userEmail1;
+	var userEmail2 = req.body.userEmail2;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/follow] POST');
+		console.log('userEmail1 = ' + userEmail1);
+		console.log('userEmail2 = ' + userEmail2);
+	}
+
+	if(!isFollowing(userEmail1, userEmail2)){
+
+		follow(userEmail1, userEmail2);
+
+		if(debug){
+			console.log('<Following SUCCESS>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+		
+
+	}
+	else{
+
+		if(debug){
+			console.log('user1 is already following user2');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('user1 is already following user2');
+    	res.end();
+	}
+    
+});
+
+app.post('/unfollow', function (req, res) {
+
+	var userEmail1 = req.body.userEmail1;
+	var userEmail2 = req.body.userEmail2;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/unfollow] POST');
+		console.log('userEmail1 = ' + userEmail1);
+		console.log('userEmail2 = ' + userEmail2);
+	}
+
+	if(isFollowing(userEmail1, userEmail2)){
+
+		unfollow(userEmail1, userEmail2);
+
+		if(debug){
+			console.log('<Unfollowing SUCCESS>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+		
+
+	}
+	else{
+
+		if(debug){
+			console.log('user1 is not following user2');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('user1 is not following user2');
+    	res.end();
+	}
+    
+});
+
 app.get('/pet', function (req, res) {
 
 	var parsedUrl = url.parse(req.url);
@@ -1154,23 +1387,25 @@ app.get('/pet/:pet_id', function (req, res) {
 
 	if(isPetExist(pet_id)){
 
+		var thePet = petFindById(pet_id);
+
 		if(debug){
 			console.log('<PET FOUND>');
-			console.log('{\"id\" : ' + pets[pet_id].pet_id + ', ' +
-    			   '\"petName\" : \"' + pets[pet_id].pet_name + '\", ' +
-    			   '\"petProfileImage\" : \"' + pets[pet_id].profile_pic_url + '\", ' +
-    			   '\"petBirthDay\" : \"' + pets[pet_id].pet_birthday + '\", ' +
-    			   '\"owner\" : \"' + pets[pet_id].owner + '\"}');
+			console.log('{\"id\" : ' + thePet.pet_id + ', ' +
+    			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
+    			   '\"owners\" : \"' + arrayToString(thePet.owners) + '\"}');
 			console.log('***********************');
 		}
 
 
 		res.writeHead(200, headerContent);
-    	res.write('{\"id\" : ' + pets[pet_id].pet_id + ', ' +
-    			   '\"petName\" : \"' + pets[pet_id].pet_name + '\", ' +
-    			   '\"petProfileImage\" : \"' + pets[pet_id].profile_pic_url + '\", ' +
-    			   '\"petBirthDay\" : \"' + pets[pet_id].pet_birthday + '\", ' +
-    			   '\"owner\" : \"' + pets[pet_id].owner + '\"}');
+    	res.write('{\"id\" : ' + thePet.pet_id + ', ' +
+    			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
+    			   '\"owner\" : \"' + arrayToString(thePet.owners) + '\"}');
     	res.end();
 	}
 	else{
@@ -1188,54 +1423,197 @@ app.get('/pet/:pet_id', function (req, res) {
     
 });
 
-app.post('/card', function (req, res) {
+app.put('/pet/:pet_id', function (req, res) {
 
-	var pets = req.body.pets;
-	var pictures = req.body.picture;
-	var videos = req.body.video;
-	var title = req.body.title;
-	var text = req.body.text;
+	var pet_id = req.params.pet_id;
 
 	if(debug){
 		console.log('***********************');
-		console.log('[/card] POST');
-		console.log('title = ' + title);
-		console.log('pets = ' + pets);
-		console.log('text = ' + text);
-		console.log('picture = ' + pictures);
-		console.log('video = ' + videos);
+		console.log('[/pet/:pet_id] PUT');
+		console.log('pet_id = ' + pet_id);
 	}
 
-	if(title){
+	if(isPetExist(pet_id)){
 
-		var c = new card();
-		c.title = title;
-		c.text = text;
+		var pet_name = req.body.petName;
+		var profile_pic_url = req.body.profile_pic_url;
+		var intro = req.body.introduceText;
+		var pet_birthday = req.body.pet_birthday;
 
-		//TODO picture & video save
-
-		addCard(c);
+		modifyPet(pet_id, pet_name, profile_pic_url, intro, pet_birthday);
 
 		if(debug){
-			console.log('<CARD CREATED>');
-			console.log('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+			console.log('<PET MODIFIED>');
 			console.log('***********************');
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+	    res.write('{ \"success\" : True }');
 	    res.end();
-
 	}
 	else{
 
 		if(debug){
-			console.log('TITLE NOT PROVIDED');
+			console.log('PET NOT FOUND');
 			console.log('***********************');
 		}
 
 		res.writeHead(404, headerContent);
-    	res.write('Title is not provided');
+    	res.write('No pet is found');
+    	res.end();
+	}
+
+    
+});
+
+app.post('/pet/addOwner/:pet_id', function (req, res) {
+
+	var pet_id = req.params.pet_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet/addOwner/:pet_id] POST');
+		console.log('pet_id = ' + pet_id);
+	}
+
+	if(isPetExist(pet_id)){
+
+		var newOwnerEmail = req.body.newOwner;
+
+		if(userFindByEmail(newOwnerEmail)){
+
+			petOwnerAdd(pet_id, newOwnerEmail);
+
+			if(debug){
+				console.log('newOwner = ' + newOwnerEmail);
+				console.log('<PET OWNER ADDED>');
+				console.log('***********************');
+			}
+
+			res.writeHead(200, headerContent);
+		    res.write('{ \"success\" : True }');
+		    res.end();
+		}
+		else{
+
+			if(debug){
+				console.log('newOwner= = ' + newOwnerEmail);
+				console.log('NEW OWNER NOT FOUND');
+				console.log('***********************');
+			}
+
+			res.writeHead(404, headerContent);
+	    	res.write('New owner is not found');
+	    	res.end();
+
+		}
+	}
+	else{
+
+		if(debug){
+			console.log('PET NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No pet is found');
+    	res.end();
+	}
+
+    
+});
+
+app.delete('/pet/deleteOwner/:pet_id', function (req, res) {
+
+	var pet_id = req.params.pet_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet/addOwner/:pet_id] POST');
+		console.log('pet_id = ' + pet_id);
+	}
+
+	if(isPetExist(pet_id)){
+
+		var oldOwnerEmail = req.body.oldOwner;
+
+		if(userFindByEmail(oldOwnerEmail)){
+
+			petOwnerDelete(pet_id, oldOwnerEmail);
+
+			if(debug){
+				console.log('oldOwner = ' + oldOwnerEmail);
+				console.log('<PET OWNER DELETED>');
+				console.log('***********************');
+			}
+
+			res.writeHead(200, headerContent);
+		    res.write('{ \"success\" : True }');
+		    res.end();
+		}
+		else{
+
+			if(debug){
+				console.log('oldOwner = ' + oldOwnerEmail);
+				console.log('OLD OWNER NOT FOUND');
+				console.log('***********************');
+			}
+
+			res.writeHead(404, headerContent);
+	    	res.write('Old owner is not found');
+	    	res.end();
+
+		}
+	}
+	else{
+
+		if(debug){
+			console.log('PET NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No pet is found');
+    	res.end();
+	}
+
+    
+});
+
+app.delete('/pet/:pet_id', function (req, res) {
+
+	var pet_id = req.params.pet_id;
+
+	var u = petFindById(pet_id);
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet/:pet_id] DELETE');
+		console.log('pet_id = ' + pet_id);
+	}
+
+	if(u){
+
+		deletePet(pet_id);
+
+		if(debug){
+			console.log('<PET DELETED>');
+			console.log('***********************');
+		}
+
+	    res.writeHead(200, headerContent);
+	    res.write('{\"success\" : True}');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('PET NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No pet is found');
     	res.end();
 	}
 
@@ -1266,7 +1644,7 @@ app.get('/userPet/:userEmail', function (req, res) {
 							'\"id\" : ' +  p.pet_id + ', ' +
 							'\"petBirthDay\" : \"' +  p.pet_birthday + '\", ' +
 							'\"introduceText\" : \"' +  p.intro + '\", ' + 
-							'\"owner\" : \"' +  p.user_id + '\" },'
+							'\"owners\" : \"' +  arrayToString(p.owners) + '\" },'
     	)
 
 		if(petFound.length > 0){
@@ -1301,6 +1679,476 @@ app.get('/userPet/:userEmail', function (req, res) {
     
 });
 
+app.post('/card', function (req, res) {
+
+	var pets = req.body.pets;
+	var pictures = req.body.picture;
+	var videos = req.body.video;
+	var tags = req.body.tag;
+	var title = req.body.title;
+	var text = req.body.text;
+	var location = req.body.location;
+	var pet_id = req.body.pet_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/card] POST');
+		console.log('title = ' + title);
+		console.log('pets = ' + pets);
+		console.log('text = ' + text);
+		console.log('picture = ' + pictures);
+		console.log('video = ' + videos);
+		console.log('tag = ' + tags);
+	}
+
+	if(title){
+
+		var c = new card(pet_id);
+		c.title = title;
+		c.text = text;
+		c.location = location;
+
+		//TODO tag & picture & video save
+
+		addCard(c);
+
+		if(debug){
+			console.log('<CARD CREATED>');
+			console.log('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+	    res.end();
+
+	}
+	else{
+
+		if(debug){
+			console.log('TITLE NOT PROVIDED');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('Title is not provided');
+    	res.end();
+	}
+
+});
+
+app.get('/card/:card_id', function (req, res) {
+
+	var card_id = req.params.card_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/card/:card_id] GET');
+		console.log('card_id = ' + card_id);
+	}
+
+	var theCard = cardFindById(card_id);
+
+	if(theCard){
+
+		if(debug){
+			console.log('<CARD FOUND>');
+			console.log('{\"id\" : ' + theCard.card_id + ', ' +
+    			   '\"title\" : \"' + theCard.title + '\", ' +
+    			   '\"text\" : \"' + theCard.text + '\", ' +
+    			   '\"date\" : \"' + theCard.date + '\", ' +
+    			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
+    			   '\"comment_id\" : \"' + arrayToString(theCard.comment_id) + '\", ' +
+    			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
+    			   '\"picture_id\" : \"' + arrayToString(theCard.picture_id) + '\", ' +
+    			   '\"pet_id\" : \"' + arrayToString(theCard.pet_id) + '\", ' +
+    			   '\"location\" : \"' + theCard.location + '\"}');
+			console.log('***********************');
+		}
+
+
+		res.writeHead(200, headerContent);
+    	res.write('{\"id\" : ' + theCard.card_id + ', ' +
+    			   '\"title\" : \"' + theCard.title + '\", ' +
+    			   '\"text\" : \"' + theCard.text + '\", ' +
+    			   '\"date\" : \"' + theCard.date + '\", ' +
+    			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
+    			   '\"comment_id\" : \"' + arrayToString(theCard.comment_id) + '\", ' +
+    			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
+    			   '\"picture_id\" : \"' + arrayToString(theCard.picture_id) + '\", ' +
+    			   '\"pet_id\" : \"' + arrayToString(theCard.pet_id) + '\", ' +
+    			   '\"location\" : \"' + theCard.location + '\"}');
+    	res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('CARD NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No card is found');
+    	res.end();
+	}
+
+    
+});
+
+app.put('/card/:card_id', function (req, res) {
+
+	var card_id = req.params.card_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/card/:card_id] PUT');
+		console.log('card_id = ' + card_id);
+	}
+
+	var theCard = cardFindById(card_id);
+
+	if(theCard){
+
+		var title = req.body.title;
+		var text = req.body.text;
+		var tag_id = req.body.tag;
+		var picture_id = req.body.picture;
+		var video_id = req.body.video;
+		var location = req.body.location;
+		
+		//TODO tag & picture & video modifying
+
+		modifyCard(card_id, location, title, text, tag_id, picture_id, video_id);
+
+		if(debug){
+			console.log('<CARD MODIFIED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('CARD NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No card is found');
+    	res.end();
+	}
+
+    
+});
+
+app.delete('/card/:card_id', function (req, res) {
+
+	var card_id = req.params.card_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/card/:card_id] DELETE');
+		console.log('card_id = ' + card_id);
+	}
+
+	var theCard = cardFindById(card_id);
+
+	if(theCard){
+
+		deleteCard(card_id);
+
+		if(debug){
+			console.log('<CARD DELETED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('CARD NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No card is found');
+    	res.end();
+	}
+
+    
+});
+
+app.post('/comment', function (req, res) {
+
+	var text = req.body.text;
+	var user_email = req.body.userEmail;
+	var card_id = req.body.cardId;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/comment] POST');
+		console.log('text = ' + text);
+		console.log('userEmail = ' + user_email);
+		console.log('cardId = ' + card_id);
+	}
+
+	if(user_email && card_id && text){
+
+		var c = new comment(card_id);
+		c.text = text;
+		c.user_email = user_email;
+
+		addComment(c);
+
+		if(debug){
+			console.log('<COMMENT CREATED>');
+			console.log('{\"comment_id\" : ' + c.comment_id + ', \"success\" : True }');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{\"comment_id\" : ' + c.comment_id + ', \"success\" : True }');
+	    res.end();
+
+	}
+	else{
+
+		if(debug){
+			console.log('Insufficent datum provided');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('Insufficent datum provided');
+    	res.end();
+	}
+
+});
+
+app.get('/comment/:comment_id', function (req, res) {
+
+	var comment_id = req.params.comment_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/comment/:comment_id] GET');
+		console.log('comment_id = ' + comment_id);
+	}
+
+	var theComment = commentFindById(comment_id);
+
+	if(theComment){
+
+		if(debug){
+			console.log('<COMMENT FOUND>');
+			console.log('{\"id\" : ' + theComment.comment_id + ', ' +
+    			   '\"text\" : \"' + theComment.text + '\", ' +
+    			   '\"date\" : \"' + theComment.date + '\", ' +
+    			   '\"userEmail\" : \"' + theComment.user_email + '\", ' +
+    			   '\"card_id\" : \"' + theComment.card_id + '\"}');
+			console.log('***********************');
+		}
+
+
+		res.writeHead(200, headerContent);
+    	res.write('{\"id\" : ' + theComment.comment_id + ', ' +
+    			   '\"text\" : \"' + theComment.text + '\", ' +
+    			   '\"date\" : \"' + theComment.date + '\", ' +
+    			   '\"userEmail\" : \"' + theComment.user_email + '\", ' +
+    			   '\"card_id\" : \"' + theComment.card_id + '\"}');
+    	res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('COMMENT NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No comment is found');
+    	res.end();
+	}
+
+    
+});
+
+app.put('/comment/:comment_id', function (req, res) {
+
+	var comment_id = req.params.comment_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/comment/:comment_id] PUT');
+		console.log('comment_id = ' + comment_id);
+	}
+
+	var theComment = commentFindById(comment_id);
+
+	if(theComment){
+
+		var text = req.body.text;
+		var userEmail = req.body.userEmail;
+		var card_id = req.body.card_id;
+
+		modifyComment(card_id, text);
+
+		if(debug){
+			console.log('<COMMENT MODIFIED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('COMMENT NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No comment is found');
+    	res.end();
+	}
+
+    
+});
+
+app.delete('/comment/:comment_id', function (req, res) {
+
+	var comment_id = req.params.comment_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/comment/:comment_id] DELETE');
+		console.log('comment_id = ' + comment_id);
+	}
+
+	var theComment = commentFindById(comment_id);
+
+	if(theComment){
+
+		deleteComment(comment_id);
+
+		if(debug){
+			console.log('<COMMENT DELETED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('COMMENT NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No comment is found');
+    	res.end();
+	}
+
+    
+});
+
+app.post('/like', function (req, res) {
+
+	this.like_id = like_count++;
+	this.date = Date.now();
+	this.user_email = 0;
+	this.card_id = card_id;
+
+	var user_email = req.body.userEmail;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/like] POST');
+		console.log('userEmail = ' + user_email);
+	}
+
+	if(user_email){
+
+		var l = new like(card_id);
+		l.user_email = user_email;
+
+		addLike(l);
+
+		if(debug){
+			console.log('<LIKE CREATED>');
+			console.log('{\"like_id\" : ' + l.like_id + ', \"success\" : True }');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{\"like_id\" : ' + l.like_id + ', \"success\" : True }');
+	    res.end();
+
+	}
+	else{
+
+		if(debug){
+			console.log('Insufficent datum provided');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('Insufficent datum provided');
+    	res.end();
+	}
+
+});
+
+app.delete('/like/:like_id', function (req, res) {
+
+	var like_id = req.params.like_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/like/:like_id] DELETE');
+		console.log('like_id = ' + like_id);
+	}
+
+	var theLike = likeFindById(like_id);
+
+	if(theLike){
+
+		deleteLike(like_id);
+
+		if(debug){
+			console.log('<LIKE DELETED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : True }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('LIKE NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No like is found');
+    	res.end();
+	}
+
+    
+});
 
 app.listen(port, function (){
 	console.log('PetStagram listening on port ' + port);
@@ -1308,6 +2156,7 @@ app.listen(port, function (){
 		dev_init(); 
 	}
 });
+
 
 
 // Password Encryption
@@ -1441,4 +2290,22 @@ function SHA256(s){
         s = Utf8Encode(s);
         return binb2hex(core_sha256(str2binb(s), s.length * chrsz));
       
+}
+
+function arrayToString(arr){
+
+	if(arr.length > 1){
+
+		var str = '[';
+
+		arr.forEach((e) => {
+			str = str + '\"' + e + '\",';
+		});
+
+		return str.substring(0, str.length-1) + ']';
+	}
+	else{
+		return '[]';
+	}
+
 }
