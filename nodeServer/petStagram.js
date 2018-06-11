@@ -690,7 +690,7 @@ function deleteVideo(video_id){
 }
 
 // Class & function for Memo
-function memo(user_email, pet_id){
+function memo(user_email){
 	this.memo_id = memo_count++;
 	this.text = "";
 	this.date = "";
@@ -2249,7 +2249,6 @@ app.post('/memo', function (req, res) {
 
 	var text = req.body.text;
 	var user_email = authToEmail(req.headers.authorization);
-	var pet_id = req.body.pet_id;
 	var date = req.body.date;
 
 	if(debug){
@@ -2257,13 +2256,12 @@ app.post('/memo', function (req, res) {
 		console.log('[/pet] POST');
 		console.log('text = ' + text);
 		console.log('userEmail = ' + user_email);
-		console.log('pet_id = ' + pet_id);
 		console.log('date = ' + date);
 	}
 
 	if(user_email && text && date){
 
-		var m = new memo(user_email, pet_id);
+		var m = new memo(user_email);
 		m.text = text;
 		m.date = date;
 
@@ -2325,8 +2323,7 @@ app.get('/memo', function (req, res) {
 			memosJson = memosJson + '{\"id\" : ' + m.memo_id + ', ' +
     			   '\"text\" : \"' + m.text + '\", ' +
     			   '\"date\" : \"' + m.date + '\", ' +
-    			   '\"userEmail\" : \"' + m.user_email + '\", ' +
-    			   '\"pet_id\" : \"' + m.pet_id + '\"},';
+    			   '\"userEmail\" : \"' + m.user_email + '\"}';
 
 		});
 
@@ -2379,8 +2376,7 @@ app.get('/memo/:memo_id', function (req, res) {
 			console.log('{\"id\" : ' + theMemo.memo_id + ', ' +
     			   '\"text\" : \"' + theMemo.text + '\", ' +
     			   '\"date\" : \"' + theMemo.date + '\", ' +
-    			   '\"userEmail\" : \"' + theMemo.user_email + '\", ' +
-    			   '\"pet_id\" : \"' + theMemo.pet_id + '\"}');
+    			   '\"userEmail\" : \"' + theMemo.user_email + '\"}');
 			console.log('***********************');
 		}
 
