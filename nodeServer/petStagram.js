@@ -2349,9 +2349,16 @@ app.get('/memo', function (req, res) {
 			memosJson = memosJson + '{\"id\" : ' + m.memo_id + ', ' +
     			   '\"text\" : \"' + m.text + '\", ' +
     			   '\"date\" : \"' + m.date + '\", ' +
-    			   '\"userEmail\" : \"' + m.user_email + '\"}';
+    			   '\"userEmail\" : \"' + m.user_email + '\"}, ';
 
 		});
+
+		if(u.memo_id.length > 0){
+			memosJson = memosJson.substring(0,memosJson.length-2) +']';
+		}
+		else{
+			memosJson = '[]';
+		}
 
 		if(debug){
 			console.log('<MEMO FOUND>');
