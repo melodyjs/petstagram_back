@@ -968,6 +968,34 @@ app.get('/user/:user_email', function (req, res) {
 			followingNames = followingNames + ']';
 		}
 
+		var totalPost = 0;
+		var petsJson = '[';
+
+
+		u.pet_id.forEach((p_i) => {
+
+			var p = petFindById(p_i);
+
+			totalPost = totalPost + p.card_id.length;
+
+			petsJson = petsJson + '{\"id\" : ' + p.pet_id + ', ' +
+    			   '\"petName\" : \"' + p.pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + p.profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + p.pet_birthday + '\", ' +
+    			   '\"introduceText\" : \"' + p.intro + '\", ' +
+    			   '\"owner\" : \"' + arrayToString(p.owners) + '\"},';
+
+		});
+
+		if(petsJson.length > 0){
+			petsJson = petsJson.substring(0, petsJson.length-1) + ']';
+
+		}
+		else{
+			petsJson = '[]';
+		}
+
+
 		if(debug){
 			console.log('<FOLLOWING FOUND>');
 			console.log('{\"user_id\" : ' + u.user_id + ', ' +
@@ -975,9 +1003,9 @@ app.get('/user/:user_email', function (req, res) {
 	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
 	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
 				'\"introduceText\" : \"' + u.intro + '\", ' +
-				'\"pet_id\" : ' + arrayToString(u.pet_id) + ', ' + 
+				'\"pet_id\" : ' + petsJson + ', ' + 
 				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
-				'\"totalPost\" : ' + u.card_id.length + ', ' +
+				'\"totalPost\" : ' + totalPost + ', ' +
 				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
 				'\"totalFollowed\" : ' + u.followed_id.length + ', ' +
 				'\"followingNames\" : ' + followingNames + '}');
@@ -990,9 +1018,9 @@ app.get('/user/:user_email', function (req, res) {
 	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
 	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
 				'\"introduceText\" : \"' + u.intro + '\", ' +
-				'\"pet_id\" : ' + arrayToString(u.pet_id) + ', ' +
+				'\"pet_id\" : ' + petsJson + ', ' + 
 				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
-				'\"totalPost\" : ' + u.card_id.length + ', ' +
+				'\"totalPost\" : ' + totalPost + ', ' +
 				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
 				'\"totalFollowed\" : ' + u.followed_id.length + ', ' +
 				'\"followingNames\" : ' + followingNames + '}');
