@@ -8,11 +8,11 @@ app.use(bodyParser.urlencoded({
 
 app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, authorization, X-Requested-With");
   next();
 });
 
-var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'};
+var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Content-Type, Access-Control-Allow-Headers, authorization, X-Requested-With'};
 
 app.use(bodyParser.json());
 
@@ -778,7 +778,7 @@ app.post('/login', function (req, res) {
 
 	if(debug){
 		console.log('***********************' +
-			        '[/login] POST\n ' + 
+			        '[/login] POST\n' + 
 			        'email = ' + login_id + '\n' +
 			        'password = ' + req.body.password);
 	}
@@ -789,12 +789,13 @@ app.post('/login', function (req, res) {
 
 		if(idFound.login_password == login_password){
 
+			var accessToken = Buffer.from(login_id).toString('base64');
+
 			if(debug){
 				console.log('<Login Success>');
+				console.log('{\"token\" : \"' + accessToken + '\.' + SHA256(login_id + login_password) + '\"}');
 				console.log('***********************');
 			}
-
-			var accessToken = Buffer.from(login_id).toString('base64');
 
 			res.writeHead(200, headerContent);
     		res.write('{\"token\" : \"' + accessToken + '\.' + SHA256(login_id + login_password) + '\"}');
@@ -2012,7 +2013,7 @@ app.delete('/card/:card_id', function (req, res) {
 app.post('/comment', function (req, res) {
 
 	var text = req.body.text;
-	var user_email = req.body.userEmail;
+	var user_email = authToEmail(req.headers.authorization);
 	var card_id = req.body.cardId;
 
 	if(debug){
@@ -2192,7 +2193,7 @@ app.delete('/comment/:comment_id', function (req, res) {
 app.post('/memo', function (req, res) {
 
 	var text = req.body.text;
-	var user_email = req.body.userEmail;
+	var user_email = authToEmail(req.headers.authorization);
 	var pet_id = req.body.pet_id;
 	var date = req.body.date;
 
@@ -2438,7 +2439,7 @@ app.delete('/memo/:memo_id', function (req, res) {
 app.post('/like', function (req, res) {
 
 	var card_id = req.body.card_id;
-	var user_email = req.body.userEmail;
+	var user_email = authToEmail(req.headers.authorization);
 
 	if(debug){
 		console.log('***********************');
