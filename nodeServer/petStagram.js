@@ -2329,6 +2329,12 @@ app.get('/memo', function (req, res) {
 
 		});
 
+		if(debug){
+			console.log('<MEMO FOUND>');
+			console.log(memosJson);
+			console.log('***********************');
+		}
+
 		if(u.memo_id.length > 0){
 
 			memosJson = memosJson.substring(0, memosJson.length-1) + ']';
