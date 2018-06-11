@@ -2681,7 +2681,7 @@ function arrayToString(arr){
 
 function authToEmail(auth){
 
-	var emailAuth = auth.split('.')[0];
+	var emailAuth = auth.substring(6).split('.')[0];
 
 	return Buffer.from(emailAuth, 'base64').toString('ascii');
 
