@@ -992,7 +992,7 @@ app.put('/user/:user_email', function (req, res) {
 
 app.delete('/user/:user_email', function (req, res) {
 
-	var user_email = req.params.user_email;
+	var user_email = req.params.userEmail;
 
 	var u = userFindByEmail(user_email);
 
@@ -1395,7 +1395,8 @@ app.get('/pet/:pet_id', function (req, res) {
     			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
     			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
     			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
-    			   '\"owners\" : \"' + arrayToString(thePet.owners) + '\"}');
+    			   '\"introduceText\" : \"' + thePet.intro + '\", ' +
+    			   '\"owner\" : \"' + arrayToString(thePet.owners) + '\"}');
 			console.log('***********************');
 		}
 
@@ -1405,6 +1406,7 @@ app.get('/pet/:pet_id', function (req, res) {
     			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
     			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
     			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
+    			   '\"introduceText\" : \"' + thePet.intro + '\", ' +p
     			   '\"owner\" : \"' + arrayToString(thePet.owners) + '\"}');
     	res.end();
 	}
@@ -1436,9 +1438,9 @@ app.put('/pet/:pet_id', function (req, res) {
 	if(isPetExist(pet_id)){
 
 		var pet_name = req.body.petName;
-		var profile_pic_url = req.body.profile_pic_url;
+		var profile_pic_url = req.body.petProfileImage;
 		var intro = req.body.introduceText;
-		var pet_birthday = req.body.pet_birthday;
+		var pet_birthday = req.body.petBirthDay;
 
 		modifyPet(pet_id, pet_name, profile_pic_url, intro, pet_birthday);
 
@@ -1681,7 +1683,6 @@ app.get('/userPet/:userEmail', function (req, res) {
 
 app.post('/card', function (req, res) {
 
-	var pets = req.body.pets;
 	var pictures = req.body.picture;
 	var videos = req.body.video;
 	var tags = req.body.tag;
@@ -1693,8 +1694,8 @@ app.post('/card', function (req, res) {
 	if(debug){
 		console.log('***********************');
 		console.log('[/card] POST');
-		console.log('title = ' + title);
-		console.log('pets = ' + pets);
+		console.log('title = ' + title);t
+		console.log('pet_id = ' + pet_id);
 		console.log('text = ' + text);
 		console.log('picture = ' + pictures);
 		console.log('video = ' + videos);
@@ -2065,11 +2066,7 @@ app.delete('/comment/:comment_id', function (req, res) {
 
 app.post('/like', function (req, res) {
 
-	this.like_id = like_count++;
-	this.date = Date.now();
-	this.user_email = 0;
-	this.card_id = card_id;
-
+	var card_id = req.body.card_id;
 	var user_email = req.body.userEmail;
 
 	if(debug){
@@ -2078,7 +2075,7 @@ app.post('/like', function (req, res) {
 		console.log('userEmail = ' + user_email);
 	}
 
-	if(user_email){
+	if(user_email && card_id){
 
 		var l = new like(card_id);
 		l.user_email = user_email;
