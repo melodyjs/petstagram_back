@@ -1230,7 +1230,7 @@ app.get('/user', function (req, res) {
 				}
 
 				res.writeHead(200, headerContent);
-	    		res.write('{ \"isFollow\" : True }');
+	    		res.write('{ \"isFollow\" : true }');
 	    		res.end();
 
 			}
@@ -1242,7 +1242,7 @@ app.get('/user', function (req, res) {
 				}
 
 				res.writeHead(200, headerContent);
-	    		res.write('{ \"isFollow\" : False }');
+	    		res.write('{ \"isFollow\" : false }');
 	    		res.end();
 
 			}
