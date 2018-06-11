@@ -11,7 +11,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html'};
+var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Authorization'};
 
 app.use(bodyParser.json());
 
@@ -824,7 +824,7 @@ app.post('/register', function (req, res) {
 				}
 
 				res.writeHead(200, headerContent);
-		    	res.write('{\"user_id\" : ' + user_id  + ', \"pet_id\" : ' + pet_id + ', \"success\" : True}');
+		    	res.write('{\"user_id\" : ' + user_id  + ', \"pet_id\" : ' + pet_id + ', \"success\" : true}');
 		    	res.end();
 	    	}
 	    	else{
@@ -973,7 +973,7 @@ app.put('/user/:user_email', function (req, res) {
 		}
 
 	    res.writeHead(200, headerContent);
-	    res.write('{\"success\" : True}');
+	    res.write('{\"success\" : true}');
 	    res.end();
 	}
 	else{
@@ -1012,7 +1012,7 @@ app.delete('/user/:user_email', function (req, res) {
 		}
 
 	    res.writeHead(200, headerContent);
-	    res.write('{\"success\" : True}');
+	    res.write('{\"success\" : true}');
 	    res.end();
 	}
 	else{
@@ -1199,7 +1199,7 @@ app.post('/follow', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 		
 
@@ -1240,7 +1240,7 @@ app.post('/unfollow', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 		
 
@@ -1340,12 +1340,12 @@ app.post('/pet', function (req, res) {
 
 			if(debug){
 				console.log('<PET CREATED>');
-				console.log('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
+				console.log('{\"pet_id\" : ' + p.pet_id + ', \"success\" : true }');
 				console.log('***********************');
 			}
 
 			res.writeHead(200, headerContent);
-		    res.write('{\"pet_id\" : ' + p.pet_id + ', \"success\" : True }');
+		    res.write('{\"pet_id\" : ' + p.pet_id + ', \"success\" : true }');
 		    res.end();
 		}
 		else{
@@ -1450,7 +1450,7 @@ app.put('/pet/:pet_id', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 	}
 	else{
@@ -1493,7 +1493,7 @@ app.post('/pet/addOwner/:pet_id', function (req, res) {
 			}
 
 			res.writeHead(200, headerContent);
-		    res.write('{ \"success\" : True }');
+		    res.write('{ \"success\" : true }');
 		    res.end();
 		}
 		else{
@@ -1550,7 +1550,7 @@ app.delete('/pet/deleteOwner/:pet_id', function (req, res) {
 			}
 
 			res.writeHead(200, headerContent);
-		    res.write('{ \"success\" : True }');
+		    res.write('{ \"success\" : true }');
 		    res.end();
 		}
 		else{
@@ -1604,7 +1604,7 @@ app.delete('/pet/:pet_id', function (req, res) {
 		}
 
 	    res.writeHead(200, headerContent);
-	    res.write('{\"success\" : True}');
+	    res.write('{\"success\" : true}');
 	    res.end();
 	}
 	else{
@@ -1715,12 +1715,12 @@ app.post('/card', function (req, res) {
 
 		if(debug){
 			console.log('<CARD CREATED>');
-			console.log('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+			console.log('{\"card_id\" : ' + c.card_id + ', \"success\" : true }');
 			console.log('***********************');
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{\"card_id\" : ' + c.card_id + ', \"success\" : True }');
+	    res.write('{\"card_id\" : ' + c.card_id + ', \"success\" : true }');
 	    res.end();
 
 	}
@@ -1827,7 +1827,7 @@ app.put('/card/:card_id', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 	}
 	else{
@@ -1867,7 +1867,7 @@ app.delete('/card/:card_id', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 	}
 	else{
@@ -1909,12 +1909,12 @@ app.post('/comment', function (req, res) {
 
 		if(debug){
 			console.log('<COMMENT CREATED>');
-			console.log('{\"comment_id\" : ' + c.comment_id + ', \"success\" : True }');
+			console.log('{\"comment_id\" : ' + c.comment_id + ', \"success\" : true }');
 			console.log('***********************');
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{\"comment_id\" : ' + c.comment_id + ', \"success\" : True }');
+	    res.write('{\"comment_id\" : ' + c.comment_id + ', \"success\" : true }');
 	    res.end();
 
 	}
@@ -2006,7 +2006,7 @@ app.put('/comment/:comment_id', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 	}
 	else{
@@ -2046,7 +2046,7 @@ app.delete('/comment/:comment_id', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 	}
 	else{
@@ -2084,12 +2084,12 @@ app.post('/like', function (req, res) {
 
 		if(debug){
 			console.log('<LIKE CREATED>');
-			console.log('{\"like_id\" : ' + l.like_id + ', \"success\" : True }');
+			console.log('{\"like_id\" : ' + l.like_id + ', \"success\" : true }');
 			console.log('***********************');
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{\"like_id\" : ' + l.like_id + ', \"success\" : True }');
+	    res.write('{\"like_id\" : ' + l.like_id + ', \"success\" : true }');
 	    res.end();
 
 	}
@@ -2129,7 +2129,7 @@ app.delete('/like/:like_id', function (req, res) {
 		}
 
 		res.writeHead(200, headerContent);
-	    res.write('{ \"success\" : True }');
+	    res.write('{ \"success\" : true }');
 	    res.end();
 	}
 	else{
