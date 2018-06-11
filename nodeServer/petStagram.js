@@ -1406,7 +1406,7 @@ app.get('/pet/:pet_id', function (req, res) {
     			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
     			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
     			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
-    			   '\"introduceText\" : \"' + thePet.intro + '\", ' +p
+    			   '\"introduceText\" : \"' + thePet.intro + '\", ' +
     			   '\"owner\" : \"' + arrayToString(thePet.owners) + '\"}');
     	res.end();
 	}
