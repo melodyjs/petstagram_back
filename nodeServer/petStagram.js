@@ -764,6 +764,21 @@ function dev_init(){
 		users.push(u);
 	}
 
+	var u = new user();
+
+	u.login_id = "sarcr@naver.com";
+    u.login_password = SHA256("asdf");
+    u.user_nickname = "sadfasdf";
+   
+   	users.push(u);
+
+	u = new user();
+
+	u.login_id = "psi9730@naver.com";
+    u.login_password = SHA256("tmtmtmtm");
+    u.user_nickname = "sadfasdf";
+   
+   	users.push(u);
 }
 
 
