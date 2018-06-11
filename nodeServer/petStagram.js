@@ -1045,7 +1045,7 @@ app.get('/user/:user_email', function (req, res) {
 	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
 	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
 				'\"introduceText\" : \"' + u.intro + '\", ' +
-				'\"pet_id\" : ' + petsJson + ', ' + 
+				'\"pets\" : ' + petsJson + ', ' + 
 				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
 				'\"totalPost\" : ' + totalPost + ', ' +
 				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
