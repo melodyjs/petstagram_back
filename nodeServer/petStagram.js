@@ -1808,6 +1808,60 @@ app.post('/card', function (req, res) {
 
 });
 
+app.get('/card', function (req, res) {
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/card] GET');
+	}
+
+	var cardsJson = '[';
+
+	cards.forEach((c) => {
+
+		if(debug){
+			console.log('{\"id\" : ' + c.card_id + ', ' +
+	    			   '\"title\" : \"' + c.title + '\", ' +
+	    			   '\"text\" : \"' + c.text + '\", ' +
+	    			   '\"date\" : \"' + c.date + '\", ' +
+	    			   '\"tag_id\" : \"' + arrayToString(c.tag_id) + '\", ' +
+	    			   '\"comment_id\" : \"' + arrayToString(c.comment_id) + '\", ' +
+	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
+	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
+	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"location\" : \"' + c.location + '\"}');
+			console.log('***********************');
+		}
+
+		cardsJson = cardsJson + '{\"id\" : ' + c.card_id + ', ' +
+	    			   '\"title\" : \"' + c.title + '\", ' +
+	    			   '\"text\" : \"' + c.text + '\", ' +
+	    			   '\"date\" : \"' + c.date + '\", ' +
+	    			   '\"tag_id\" : \"' + arrayToString(c.tag_id) + '\", ' +
+	    			   '\"comment_id\" : \"' + arrayToString(c.comment_id) + '\", ' +
+	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
+	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
+	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"location\" : \"' + c.location + '\"},';
+		
+	});
+
+	if(cards.length > 0){
+
+		cardsJson = cardsJson.substring(0, cardsJson.length-1) + ']';
+
+		res.writeHead(200, headerContent);
+		res.write(cardsJson);
+		res.end();
+	}
+	else{
+		res.writeHead(200, headerContent);
+		res.write('[]');
+		res.end();
+	}	
+    
+});
+
 app.get('/card/:card_id', function (req, res) {
 
 	var card_id = req.params.card_id;
