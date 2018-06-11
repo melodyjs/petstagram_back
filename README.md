@@ -266,83 +266,82 @@ get all information of user's pets
   }  
   
 ## /card
-- [POST]
-- request body
-  {
-      "title" : "hi",
-      "text" : "blah blah",
-      "pet_id" : "231",
-      "tag" : "["pet","star","gram"]",
-      "picture" : "["www.~","www.~","www.~"]",
-      "video" : "["www.~","www.~","www.~"]",
-      "location" : "123,456"
-  }
-
-- response
-  {
-      "success" : True"
-  }
-
-## /card/:card_id
-- [GET]
-- response
-  {
-      "id" : 555,
-      "title" : "hi",
-      "text" : "blah blah",
-      "tag_id" : [123, 456],
-      "picture_id" : [1234, 5678],
-      "video_id" : [12, 34],
-      "comment_id" : [12456, 7890],
-      "date" : YYYYMMDD,
-      "pet_id" : 231,
-      "location" : "123, 456"
-  }
-
-- [PUT]
-- request
-"title", "text", "tag", "picture", "video", "location"
-
-- [DELETE]
-  /card/231
-
-
-## /comment
-- [POST]
-- request body
-  {
-      "text" : "hello",
-      "userEmail" : "example@petstagram.com"
-  }
-
-## /comment/:comment_id
-- [GET]
-  {
-      "id" : 231,
-      "text" : "hello",
-      "date" : YYYYMMDD,
-      "userEmail" : "example@petstagram.com",
-      "card_id" : 23
-  }
-
-- [PUT]
-- request
-"text", "userEmail", "card_id"
-
-- [DELETE]
-  /comment/231
-
-## /like
-- [POST]
-- request body
-  {
-      "userEmail" : "example@petstagram.com",
-      "card_id" : 23
-  }
-
-## /like/:like_id
-- [DELETE]
-  /like/231
+- [POST]  
+- request body  
+  {  
+      "title" : "hi",  
+      "text" : "blah blah",  
+      "pet_id" : "231",  
+      "tag" : "["pet","star","gram"]",  
+      "picture" : "["www.~","www.~","www.~"]",  
+      "video" : "["www.~","www.~","www.~"]",  
+      "location" : "123,456"  
+  }  
+  
+- response  
+  {  
+      "success" : True"  
+  }  
+  
+## /card/:card_id  
+- [GET]  
+- response  
+  {  
+      "id" : 555,  
+      "title" : "hi",  
+      "text" : "blah blah",  
+      "tag_id" : [123, 456],  
+      "picture_id" : [1234, 5678],  
+      "video_id" : [12, 34],  
+      "comment_id" : [12456, 7890],  
+      "date" : YYYYMMDD,  
+      "pet_id" : 231,  
+      "location" : "123, 456"  
+  }  
+  
+- [PUT]  
+- request  
+"title", "text", "tag", "picture", "video", "location"  
+  
+- [DELETE]  
+  /card/231  
+  
+## /comment  
+- [POST]  
+- request body  
+  {  
+      "text" : "hello",  
+      "userEmail" : "example@petstagram.com"  
+  }  
+  
+## /comment/:comment_id  
+- [GET]  
+  {  
+      "id" : 231,  
+      "text" : "hello",  
+      "date" : YYYYMMDD,  
+      "userEmail" : "example@petstagram.com",  
+      "card_id" : 23  
+  }  
+  
+- [PUT]  
+- request  
+"text", "userEmail", "card_id"  
+  
+- [DELETE]  
+  /comment/231  
+  
+## /like  
+- [POST]  
+- request body  
+  {  
+      "userEmail" : "example@petstagram.com",  
+      "card_id" : 23  
+  }  
+  
+## /like/:like_id  
+- [DELETE]  
+  /like/231  
   
 
   
