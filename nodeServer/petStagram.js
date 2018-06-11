@@ -56,7 +56,7 @@ var pictures = [];
 var video_count = 0;
 var videos = [];
 
-var momo_count = 0;
+var memo_count = 0;
 var memos = [];
 
 
