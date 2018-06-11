@@ -23,13 +23,13 @@ Node.js used
 
 ## Dev Modes
 1. Debugging log  
-set `var debug = true` in line 26 petStagram.js
+set `var debug = true` in line 29 petStagram.js
 
 2. Using local database  
-set `var localDB = true` in line 27 petStagram.js
+set `var localDB = true` in line 30 petStagram.js
 
 3. Sample database initializing  
-set `var sampleDB = true` in line 28 petStagram.js 
+set `var sampleDB = true` in line 31 petStagram.js 
 
 ## URL introduction  
 JSON format http request available
