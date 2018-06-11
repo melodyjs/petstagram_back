@@ -371,6 +371,7 @@ function card(pet_id){
 	this.video_id = [];
 	this.picture_id = [];
 	this.pet_id = pet_id;
+	this.writer = "";
 
 }
 
@@ -700,7 +701,8 @@ function memo(user_email){
 function addMemo(memo){
 	if(localDB){
 		memos.push(memo);
-		users.find((u) => u.login_id == memo.user_email).memo_id.push(memo.memo_id);
+		var theUser = users.find((u) => u.login_id == memo.user_email)
+		theUser.memo_id.push(memo.memo_id);
 	}
 	else{
 
@@ -1009,7 +1011,7 @@ app.get('/user/:user_email', function (req, res) {
     			   '\"petProfileImage\" : \"' + p.profile_pic_url + '\", ' +
     			   '\"petBirthDay\" : \"' + p.pet_birthday + '\", ' +
     			   '\"introduceText\" : \"' + p.intro + '\", ' +
-    			   '\"cards\" : \"' + cardsJson + '\", ' +
+    			   '\"cards\" : ' + cardsJson + ', ' +
     			   '\"owner\" : \"' + arrayToString(p.owners) + '\"},';
 
 		});
@@ -1817,16 +1819,18 @@ app.post('/card', function (req, res) {
 	var location = req.body.location;
 	var pet_id = req.body.pet_id;
 	var date = req.body.date;
+	var writer = authToEmail(req.headers.authorization);
 
 	if(debug){
 		console.log('***********************');
 		console.log('[/card] POST');
-		console.log('title = ' + title);t
+		console.log('title = ' + title);
 		console.log('pet_id = ' + pet_id);
 		console.log('text = ' + text);
 		console.log('picture = ' + pictures);
 		console.log('video = ' + videos);
 		console.log('tag = ' + tags);
+		console.log('writer = ' + writer);
 	}
 
 	if(title){
@@ -1836,6 +1840,7 @@ app.post('/card', function (req, res) {
 		c.text = text;
 		c.location = location;
 		c.date = date;
+		c.writer = writer;
 
 		//TODO tag & picture & video save
 
@@ -1887,6 +1892,7 @@ app.get('/card', function (req, res) {
 	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
 	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
 	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"writer\" : \"' + c.writer + '\", ' +
 	    			   '\"location\" : \"' + c.location + '\"}');
 			console.log('***********************');
 		}
@@ -1900,6 +1906,7 @@ app.get('/card', function (req, res) {
 	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
 	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
 	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"writer\" : \"' + c.writer + '\", ' +
 	    			   '\"location\" : \"' + c.location + '\"},';
 		
 	});
@@ -1945,6 +1952,7 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
     			   '\"picture_id\" : \"' + arrayToString(theCard.picture_id) + '\", ' +
     			   '\"pet_id\" : \"' + arrayToString(theCard.pet_id) + '\", ' +
+    			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
 			console.log('***********************');
 		}
@@ -1960,6 +1968,7 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
     			   '\"picture_id\" : \"' + arrayToString(theCard.picture_id) + '\", ' +
     			   '\"pet_id\" : \"' + arrayToString(theCard.pet_id) + '\", ' +
+    			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
     	res.end();
 	}
