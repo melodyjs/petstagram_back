@@ -1183,7 +1183,8 @@ app.get('/user', function (req, res) {
 	if(debug){
 		console.log('***********************');
 		console.log('[/user] GET');
-		console.log('user_email = ' + user_email);
+		console.log('userEmail = ' + userEmail);
+		console.log('userEmail2 = ' + userEmail2);
 	}
 
 	if(!userEmail2){
