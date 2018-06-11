@@ -1279,7 +1279,7 @@ app.get('/userFilter', function (req, res) {
 
 	var idFound = userEmailFilter(userEmail);
 
-	if(idFound){
+	if(idFound && userEmail.length > 0){
 
 		var json = '{\"num\":' + idFound.length + ', \"result\" : [';
 
