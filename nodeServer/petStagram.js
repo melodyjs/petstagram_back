@@ -2238,6 +2238,72 @@ app.post('/memo', function (req, res) {
 
 });
 
+app.get('/memo', function (req, res) {
+
+	var auth = req.headers.authorization;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/memo] GET');
+		console.log('auth = ' + auth);
+	}
+
+	var userEmail = authToEmail(auth);
+
+	if(userEmail){
+
+		if(debug){
+			console.log('<Authorization SUCCESS>');
+			console.log('userEmail = ' + userEmail);
+		}
+
+		var u = userFindByEmail(userEmail);
+		var m;
+
+		var memosJson = '[';
+
+		u.memo_id.forEach((m_i) => {
+
+			m = memoFindById(m_i);
+
+			memosJson = memosJson + '{\"id\" : ' + m.memo_id + ', ' +
+    			   '\"text\" : \"' + m.text + '\", ' +
+    			   '\"date\" : \"' + m.date + '\", ' +
+    			   '\"userEmail\" : \"' + m.user_email + '\", ' +
+    			   '\"pet_id\" : \"' + m.pet_id + '\"},';
+
+		});
+
+		if(u.memo_id.length > 0){
+
+			memosJson = memosJson.substring(0, memosJson.length-1) + ']';
+
+			res.writeHead(200, headerContent);
+	    	res.write(memosJson);
+	    	res.end();
+	    }
+	    else{
+
+	    	res.writeHead(200, headerContent);
+	    	res.write('[]');
+	    	res.end();
+	    }
+	}
+	else{
+
+		if(debug){
+			console.log('Authorization error');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('Authorization error');
+    	res.end();
+	}
+
+    
+});
+
 app.get('/memo/:memo_id', function (req, res) {
 
 	var memo_id = req.params.memo_id;
@@ -2609,6 +2675,14 @@ function arrayToString(arr){
 	else{
 		return '[]';
 	}
+
+}
+
+function authToEmail(auth){
+
+	var emailAuth = auth.split('.')[0];
+
+	return Buffer.from(emailAuth, 'base64').toString('ascii');
 
 }
 
