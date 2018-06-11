@@ -2253,13 +2253,13 @@ app.post('/memo', function (req, res) {
 
 	if(debug){
 		console.log('***********************');
-		console.log('[/pet] POST');
+		console.log('[/memo] POST');
 		console.log('text = ' + text);
 		console.log('userEmail = ' + user_email);
 		console.log('date = ' + date);
 	}
 
-	if(user_email && text && date){
+	if(user_email && text){
 
 		var m = new memo(user_email);
 		m.text = text;
