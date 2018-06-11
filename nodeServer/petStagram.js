@@ -6,12 +6,13 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+app.all('/*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
   next();
 });
 
-var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Authorization'};
+var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'};
 
 app.use(bodyParser.json());
 
@@ -55,6 +56,9 @@ var pictures = [];
 var video_count = 0;
 var videos = [];
 
+var momo_count = 0;
+var memos = [];
+
 
 // Class & function for User
 function user(){
@@ -68,6 +72,7 @@ function user(){
 	this.pet_id = [];
 	this.following_id = [];
 	this.followed_id = [];
+	this.memo_id = [];
 	this.intro = "";
 
 };
@@ -647,6 +652,7 @@ function pictureFindById(picture_id){
 }
 
 
+
 // Class & function for Video
 function video(card_id){
 	this.video_id = video_count++;
@@ -676,6 +682,68 @@ function deleteVideo(video_id){
 		cardVideos = cardVideos.filter((c) => c.video_id != video_id);
 
 		videos = videos.filter((v) => v.video_id != video_id);
+	}
+	else{
+
+	}
+
+}
+
+// Class & function for Memo
+function memo(user_email, pet_id){
+	this.memo_id = memo_count++;
+	this.text = "";
+	this.date = "";
+	this.user_email = user_email;
+}
+
+function addMemo(memo){
+	if(localDB){
+		memos.push(memo);
+		users.find((u) => u.login_id == memo.user_email).memo_id.push(memo.memo_id);
+	}
+	else{
+
+	}
+}
+
+function modifyMemo(memo_id, text, date){
+
+	if(localDB){
+
+		var theMemo = memos.find((m) => m.memo_id == memo_id);
+
+		if(text)
+			theMemo.text = text;
+		if(date)
+			theMemo.date = date;
+
+	}
+	else{
+
+	}
+
+}
+
+function deleteMemo(memo_id){
+
+	if(localDB){
+		var theUser = users.find((u) => u.login_id == memo_id);
+
+		theUser.memo_id = theUser.memo_id.filter((m) => m != memo_id);
+
+		memos = memos.filter((m) => m.memo_id != memo_id);
+	}
+	else{
+
+	}
+
+}
+
+function memoFindById(memo_id){
+
+	if(localDB){
+		return memos.find((m) => m.memo_id == memo_id);
 	}
 	else{
 
@@ -726,8 +794,10 @@ app.post('/login', function (req, res) {
 				console.log('***********************');
 			}
 
+			var accessToken = Buffer.from(login_id).toString('base64');
+
 			res.writeHead(200, headerContent);
-    		res.write('{\"token\" : \"' + SHA256(login_id + login_password) + '\"}');
+    		res.write('{\"token\" : \"' + accessToken + '\.' + SHA256(login_id + login_password) + '\"}');
     		res.end();
 		}
 		else{
@@ -2064,6 +2134,187 @@ app.delete('/comment/:comment_id', function (req, res) {
     
 });
 
+
+app.post('/memo', function (req, res) {
+
+	var text = req.body.text;
+	var user_email = req.body.userEmail;
+	var pet_id = req.body.pet_id;
+	var date = req.body.date;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/pet] POST');
+		console.log('text = ' + text);
+		console.log('userEmail = ' + user_email);
+		console.log('pet_id = ' + pet_id);
+		console.log('date = ' + date);
+	}
+
+	if(user_email && text && date){
+
+		var m = new memo(user_email, pet_id);
+		m.text = text;
+		m.date = date;
+
+		addMemo(m);
+
+		if(debug){
+			console.log('<MEMO CREATED>');
+			console.log('{\"memo_id\" : ' + m.memo_id + ', \"success\" : true }');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{\"memo_id\" : ' + m.memo_id + ', \"success\" : true }');
+	    res.end();
+
+	}
+	else{
+
+		if(debug){
+			console.log('Insufficent datum provided');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('Insufficent datum provided');
+    	res.end();
+	}
+
+});
+
+app.get('/memo/:memo_id', function (req, res) {
+
+	var memo_id = req.params.memo_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/memo/:comment_id] GET');
+		console.log('memo_id = ' + memo_id);
+	}
+
+	var theMemo = memoFindById(memo_id);
+
+	if(theMemo){
+
+		if(debug){
+			console.log('<MEMO FOUND>');
+			console.log('{\"id\" : ' + theMemo.memo_id + ', ' +
+    			   '\"text\" : \"' + theMemo.text + '\", ' +
+    			   '\"date\" : \"' + theMemo.date + '\", ' +
+    			   '\"userEmail\" : \"' + theMemo.user_email + '\", ' +
+    			   '\"pet_id\" : \"' + theMemo.pet_id + '\"}');
+			console.log('***********************');
+		}
+
+
+		res.writeHead(200, headerContent);
+    	res.write('{\"id\" : ' + theMemo.memo_id + ', ' +
+    			   '\"text\" : \"' + theMemo.text + '\", ' +
+    			   '\"date\" : \"' + theMemo.date + '\", ' +
+    			   '\"userEmail\" : \"' + theMemo.user_email + '\", ' +
+    			   '\"pet_id\" : \"' + theMemo.pet_id + '\"}');
+    	res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('MEMO NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No memo is found');
+    	res.end();
+	}
+
+    
+});
+
+app.put('/memo/:memo_id', function (req, res) {
+
+	var memo_id = req.params.memo_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/memo/:memo_id] PUT');
+		console.log('memo_id = ' + memo_id);
+	}
+
+	var theMemo = memoFindById(memo_id);
+
+	if(theComment){
+
+		var text = req.body.text;
+		var date = req.body.date;
+
+		modifyMemo(memo_id, text, date);
+
+		if(debug){
+			console.log('<MEMO MODIFIED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : true }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('MEMO NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No memo is found');
+    	res.end();
+	}
+
+    
+});
+
+app.delete('/memo/:memo_id', function (req, res) {
+
+	var memo_id = req.params.memo_id;
+
+	if(debug){
+		console.log('***********************');
+		console.log('[/memo/:memo_id] DELETE');
+		console.log('memo_id = ' + memo_id);
+	}
+
+	var theMemo = commentFindById(memo_id);
+
+	if(theMemo){
+
+		deleteMemo(memo_id);
+
+		if(debug){
+			console.log('<MEMO DELETED>');
+			console.log('***********************');
+		}
+
+		res.writeHead(200, headerContent);
+	    res.write('{ \"success\" : true }');
+	    res.end();
+	}
+	else{
+
+		if(debug){
+			console.log('memo NOT FOUND');
+			console.log('***********************');
+		}
+
+		res.writeHead(404, headerContent);
+    	res.write('No memo is found');
+    	res.end();
+	}
+
+    
+});
+
 app.post('/like', function (req, res) {
 
 	var card_id = req.body.card_id;
@@ -2306,3 +2557,5 @@ function arrayToString(arr){
 	}
 
 }
+
+
