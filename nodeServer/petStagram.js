@@ -971,8 +971,6 @@ app.get('/user/:user_email', function (req, res) {
 		var totalPost = 0;
 		var petsJson = '[';
 
-
-
 		u.pet_id.forEach((p_i) => {
 
 			var p = petFindById(p_i);
@@ -1016,7 +1014,7 @@ app.get('/user/:user_email', function (req, res) {
 
 		});
 
-		if(petsJson.length > 0){
+		if(u.pet_id.length > 0){
 			petsJson = petsJson.substring(0, petsJson.length-1) + ']';
 
 		}
