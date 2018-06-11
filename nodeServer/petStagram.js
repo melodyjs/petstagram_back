@@ -1816,6 +1816,7 @@ app.post('/card', function (req, res) {
 	var text = req.body.text;
 	var location = req.body.location;
 	var pet_id = req.body.pet_id;
+	var date = req.body.date;
 
 	if(debug){
 		console.log('***********************');
@@ -1834,6 +1835,7 @@ app.post('/card', function (req, res) {
 		c.title = title;
 		c.text = text;
 		c.location = location;
+		c.date = date;
 
 		//TODO tag & picture & video save
 
