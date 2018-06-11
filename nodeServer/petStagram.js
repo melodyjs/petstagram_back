@@ -972,17 +972,46 @@ app.get('/user/:user_email', function (req, res) {
 		var petsJson = '[';
 
 
+
 		u.pet_id.forEach((p_i) => {
 
 			var p = petFindById(p_i);
 
 			totalPost = totalPost + p.card_id.length;
 
+			var cardsJson = '[';
+
+			p.card_id.forEach((c_i) => {
+
+				var c = cardFindById(c_i);
+
+				cardsJson = cardsJson + '{\"id\" : ' + c.card_id + ', ' +
+	    			   '\"title\" : \"' + c.title + '\", ' +
+	    			   '\"text\" : \"' + c.text + '\", ' +
+	    			   '\"date\" : \"' + c.date + '\", ' +
+	    			   '\"tag_id\" : \"' + arrayToString(c.tag_id) + '\", ' +
+	    			   '\"comment_id\" : \"' + arrayToString(c.comment_id) + '\", ' +
+	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
+	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
+	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"location\" : \"' + c.location + '\"},';
+
+
+			});
+
+			if(p.card_id.length > 0){
+				cardsJson = cardsJson.substring(0,cardsJson.length-1) + ']';
+			}
+			else{
+				cardsJson = '[]';
+			}
+
 			petsJson = petsJson + '{\"id\" : ' + p.pet_id + ', ' +
     			   '\"petName\" : \"' + p.pet_name + '\", ' +
     			   '\"petProfileImage\" : \"' + p.profile_pic_url + '\", ' +
     			   '\"petBirthDay\" : \"' + p.pet_birthday + '\", ' +
     			   '\"introduceText\" : \"' + p.intro + '\", ' +
+    			   '\"cards\" : \"' + cardsJson + '\", ' +
     			   '\"owner\" : \"' + arrayToString(p.owners) + '\"},';
 
 		});
@@ -1003,7 +1032,7 @@ app.get('/user/:user_email', function (req, res) {
 	    		'\"username\" : \"' + u.user_nickname + '\", ' + 
 	    		'\"userProfileImage\" : \"' + u.profile_pic_url + '\", ' + 
 				'\"introduceText\" : \"' + u.intro + '\", ' +
-				'\"pet_id\" : ' + petsJson + ', ' + 
+				'\"pets\" : ' + petsJson + ', ' + 
 				'\"userBirthDay\" : \"' + u.userBirthDay + '\", ' + 
 				'\"totalPost\" : ' + totalPost + ', ' +
 				'\"totalFollowing\" : ' + u.following_id.length + ', ' +
