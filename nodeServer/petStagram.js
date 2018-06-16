@@ -1107,7 +1107,7 @@ app.get('/user/:user_email', function (req, res) {
 
 });
 
-app.put('/user/:user_email',upload.single('picture'), function (req, res) {
+app.put('/user/:user_email', upload.single('picture'), function (req, res) {
 
 	var user_email = req.params.user_email;
 
@@ -1924,18 +1924,72 @@ app.get('/card', function (req, res) {
 
 	cards.forEach((c) => {
 
+
+		var commentjson = '[';
+
+		c.comment_id.forEach((c_i) => {
+
+			var theComment = comments.find((cc) => cc.comment_id == c_i);
+			
+			commentjson = commentjson + '{\"id\" : ' + theComment.comment_id + ', ' +
+    			   '\"text\" : \"' + theComment.text + '\", ' +
+    			   '\"date\" : \"' + theComment.date + '\", ' +
+    			   '\"userEmail\" : \"' + theComment.user_email + '\", ' +
+    			   '\"card_id\" : \"' + theComment.card_id + '\"}, ';
+
+		});
+
+		if(c.comment_id > 0){
+			commentjson = commentjson.substring(0, commentjson.length-2) + ']';
+		}
+		else{
+			commentjson = '[]';
+		}
+
+
+		var picturejson = '[';
+
+		c.picture_id.forEach((p_i) => {
+
+			var thePicture = pictures.find((p) => p.picture_id == p_i);
+			
+			picturejson = picturejson + '{\"id\" : ' + thePicture.picture_id + ', ' +
+    			   '\"picture_url\" : \"' + thePicture.picture_id + '\", ' +
+    			   '\"size\" : \"' + thePicture.size + '\", ' +
+    			   '\"card_id\" : \"' + thePicture.card_id + '\"}, ';
+
+		});
+
+		if(c.picture_id > 0){
+			picturejson = picturejson.substring(0, picturejson.length-2) + ']';
+		}
+		else{
+			picturejson = '[]';
+		}
+
+
+		var thePet = pets.find((p) => p.pet_id = c.pet_id);
+
+		var petjson = '{\"id\" : ' + thePet.pet_id + ', ' +
+    			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
+    			   '\"introduceText\" : \"' + thePet.intro + '\", ' +
+    			   '\"owner\" : \"' + arrayToString(thePet.owners) + '\"}';
+
+
 		if(debug){
 			console.log('{\"id\" : ' + c.card_id + ', ' +
 	    			   '\"title\" : \"' + c.title + '\", ' +
 	    			   '\"text\" : \"' + c.text + '\", ' +
 	    			   '\"date\" : \"' + c.date + '\", ' +
-	    			   '\"tag_id\" : \"' + arrayToString(c.tag_id) + '\", ' +
-	    			   '\"comment_id\" : \"' + arrayToString(c.comment_id) + '\", ' +
-	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
-	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
-	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"tag_id\" : ' + arrayToString(c.tag_id) + ', ' +
+	    			   '\"comment_id\" : ' + commentjson + ', ' +
+	    			   '\"video_id\" : ' + arrayToString(c.video_id) + '\", ' +
+	    			   '\"picture_id\" : ' + picturejson + ', ' +
+	    			   '\"pet_id\" : ' + petjson + ', ' +
 	    			   '\"writer\" : \"' + c.writer + '\", ' +
-	    			   '\"location\" : \"' + c.location + '\"}');
+	    			   '\"location\" : \"' + c.location + '\"},');
 			console.log('***********************');
 		}
 
@@ -1943,11 +1997,11 @@ app.get('/card', function (req, res) {
 	    			   '\"title\" : \"' + c.title + '\", ' +
 	    			   '\"text\" : \"' + c.text + '\", ' +
 	    			   '\"date\" : \"' + c.date + '\", ' +
-	    			   '\"tag_id\" : \"' + arrayToString(c.tag_id) + '\", ' +
-	    			   '\"comment_id\" : \"' + arrayToString(c.comment_id) + '\", ' +
-	    			   '\"video_id\" : \"' + arrayToString(c.video_id) + '\", ' +
-	    			   '\"picture_id\" : \"' + arrayToString(c.picture_id) + '\", ' +
-	    			   '\"pet_id\" : \"' + arrayToString(c.pet_id) + '\", ' +
+	    			   '\"tag_id\" : ' + arrayToString(c.tag_id) + ', ' +
+	    			   '\"comment_id\" : ' + commentjson + ', ' +
+	    			   '\"video_id\" : ' + arrayToString(c.video_id) + '\", ' +
+	    			   '\"picture_id\" : ' + picturejson + ', ' +
+	    			   '\"pet_id\" : ' + petjson + ', ' +
 	    			   '\"writer\" : \"' + c.writer + '\", ' +
 	    			   '\"location\" : \"' + c.location + '\"},';
 		
@@ -2005,11 +2059,11 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"title\" : \"' + theCard.title + '\", ' +
     			   '\"text\" : \"' + theCard.text + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
-    			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
-    			   '\"comment_id\" : \"' + arrayToString(theCard.comment_id) + '\", ' +
-    			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
-    			   '\"picture_id\" : \"' + arrayToString(theCard.picture_id) + '\", ' +
-    			   '\"pet_id\" : \"' + arrayToString(theCard.pet_id) + '\", ' +
+    			   '\"tag_id\" : ' + arrayToString(theCard.tag_id) + ', ' +
+    			   '\"comment_id\" : ' + arrayToString(theCard.comment_id) + ', ' +
+    			   '\"video_id\" : ' + arrayToString(theCard.video_id) + ', ' +
+    			   '\"picture_id\" : ' + arrayToString(theCard.picture_id) + ', ' +
+    			   '\"pet_id\" : ' + arrayToString(theCard.pet_id) + ', ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
     	res.end();
