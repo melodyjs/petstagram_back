@@ -1848,7 +1848,7 @@ app.get('/userPet/:userEmail', function (req, res) {
     
 });
 
-app.post('/card', upload.array('pictures',3), function (req, res) {
+app.post('/card', upload.array('user[image]',3), function (req, res) {
 
 	var videos = req.body.video;
 	var tags = req.body.tag;
