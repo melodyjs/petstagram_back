@@ -1,6 +1,25 @@
 const express = require('express');
 const app = express();
 const bodyParser = require("body-parser");
+var multer = require('multer');
+
+var storage = multer.diskStorage({
+    // 서버에 저장할 폴더
+    destination: function (req, file, cb) {
+      cb(null, './database/cardPicture');
+    },
+
+    // 서버에 저장할 파일 명
+    filename: function (req, file, cb) {
+      file.uploadedFile = {
+        name: card_count,
+        ext: file.mimetype.split('/')[1]
+      };
+      cb(null, file.uploadedFile.name + '.' + file.uploadedFile.ext);
+    }
+  });
+
+var upload = multer({storage : storage});
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -732,6 +751,12 @@ function deleteMemo(memo_id){
 
 	if(localDB){
 
+		var theMemo = memos.find((m) => m.memo_id == memo_id);
+
+		var theUser = users.find((u) => u.login_id = theMemo.user_email);
+
+		theUser.memo_id = theUser.memo_id.filter((m_i) => m_i != memo_id);
+
 		memos = memos.filter((m) => m.memo_id != memo_id);
 	}
 	else{
@@ -1102,7 +1127,7 @@ app.put('/user/:user_email', function (req, res) {
 		var profile_pic_url = req.body.userProfileImage;
 		var intro = req.body.introduceText;
 
-		modifyUser(userEmail, login_id, login_password, user_nickname, profile_pic_url, intro);
+		modifyUser(user_email, login_id, login_password, user_nickname, profile_pic_url, intro);
 
 		if(debug){
 			console.log('<USER INFO MODIFIED>');
@@ -1823,9 +1848,8 @@ app.get('/userPet/:userEmail', function (req, res) {
     
 });
 
-app.post('/card', function (req, res) {
+app.post('/card', upload.array('pictures',3), function (req, res) {
 
-	var pictures = req.body.picture;
 	var videos = req.body.video;
 	var tags = req.body.tag;
 	var title = req.body.title;
@@ -1834,6 +1858,7 @@ app.post('/card', function (req, res) {
 	var pet_id = req.body.pet_id;
 	var date = req.body.date;
 	var writer = authToEmail(req.headers.authorization);
+	var pictures = req.files;
 
 	if(debug){
 		console.log('***********************');
@@ -1841,13 +1866,13 @@ app.post('/card', function (req, res) {
 		console.log('title = ' + title);
 		console.log('pet_id = ' + pet_id);
 		console.log('text = ' + text);
-		console.log('picture = ' + pictures);
+		console.log('pictures = ' + pictures.length);
 		console.log('video = ' + videos);
 		console.log('tag = ' + tags);
 		console.log('writer = ' + writer);
 	}
 
-	if(title){
+	if(title && isSaved(pictures)){
 
 		var c = new card(pet_id);
 		c.title = title;
@@ -2776,4 +2801,62 @@ function authToEmail(auth){
 
 }
 
+function isSaved(upFile) {
+
+    var savedFile = upFile;
+    var count = 0;
+    if(savedFile != null) { 
+        for (var i = 0; i < savedFile.length; i++) {
+            if(fs.statSync(getDirname(1) + savedFile[i].path).isFile()){
+            	if(debug){
+            		console.log(getDirname(1) + savedFile[i].path);
+            	}
+                count ++; 
+            };
+        }
+        if(count == savedFile.length){
+            return true;
+        }else{ 
+            return false;
+        }
+    }else{
+        return true;
+    }
+}
+
+function getDirname(num){
+    var order = num;
+    var dirname = __dirname.split('/');
+    var result = '';
+    for(var i=0;i<dirname.length-order;i++){
+        result += dirname[i] + '/';
+    }
+    return result;
+}
+
+ function renameUploadFile(itemId,upFile){
+    var renameForUpload = {};
+    var newFile = upFile; // 새로 들어 온 파일
+    var tmpPath = [];
+    var tmpType = [];
+    var index = [];
+    var rename = [];
+    var fileName = [];
+    var fullName = []; // 다운로드 시 보여줄 이름 필요하니까 원래 이름까지 같이 저장하자!
+    var fsName = [];
+    for (var i = 0; i < newFile.length; i++) {
+        tmpPath[i] = newFile[i].path;
+        tmpType[i] = newFile[i].mimetype.split('/')[1]; // 확장자 저장해주려고!
+        index[i] = tmpPath[i].split('/').length;
+        rename[i] = tmpPath[i].split('/')[index[i] - 1];
+        fileName [i] = itemId + "_" + getFileDate(new Date()) + "_" + rename[i] + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
+        fullName [i] = fileName[i] + ":" + newFile[i].originalname.split('.')[0]; // 원래 이름까지 같이 가는 이름 "글아이디_날짜_파일명.확장자:보여줄 이름"
+        fsName [i] = getDirname(1)+"upload/"+fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"
+    }
+    renameForUpload.tmpname = tmpPath;
+    renameForUpload.filename = fileName;
+    renameForUpload.fullname = fullName;
+    renameForUpload.fsname = fsName;
+    return renameForUpload;
+}
 
