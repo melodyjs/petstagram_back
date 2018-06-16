@@ -1339,8 +1339,8 @@ app.get('/userFilter', function (req, res) {
 			console.log('***********************');
 		}
 
-		res.writeHead(404, headerContent);
-    	res.write('User e-mail not found');
+		res.writeHead(200, headerContent);
+    	res.write('[]');
     	res.end();
 	}
 
