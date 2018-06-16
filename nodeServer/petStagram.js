@@ -9,10 +9,11 @@ app.use(bodyParser.urlencoded({
 app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, authorization, X-Requested-With");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   next();
 });
 
-var headerContent = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Content-Type, Access-Control-Allow-Headers, authorization, X-Requested-With'};
+var headerContent = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE'  ,'Content-Type': 'text/html', 'Access-Control-Allow-Headers' : 'Content-Type, Access-Control-Allow-Headers, authorization, X-Requested-With'};
 
 app.use(bodyParser.json());
 
@@ -730,9 +731,6 @@ function modifyMemo(memo_id, text, date){
 function deleteMemo(memo_id){
 
 	if(localDB){
-		var theUser = users.find((u) => u.login_id == memo_id);
-
-		theUser.memo_id = theUser.memo_id.filter((m) => m != memo_id);
 
 		memos = memos.filter((m) => m.memo_id != memo_id);
 	}
@@ -2497,7 +2495,7 @@ app.delete('/memo/:memo_id', function (req, res) {
 		console.log('memo_id = ' + memo_id);
 	}
 
-	var theMemo = commentFindById(memo_id);
+	var theMemo = memoFindById(memo_id);
 
 	if(theMemo){
 
