@@ -1875,7 +1875,7 @@ app.post('/card', upload.array('file',3), function (req, res) {
 		console.log('writer = ' + writer);
 	}
 
-	if(title && isSaved(pictures)){
+	if(title){
 
 		var c = new card(pet_id);
 		c.title = title;
