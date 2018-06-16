@@ -1989,6 +1989,7 @@ app.get('/card', function (req, res) {
 	    			   '\"picture_id\" : ' + picturejson + ', ' +
 	    			   '\"pet_id\" : ' + petjson + ', ' +
 	    			   '\"writer\" : \"' + c.writer + '\", ' +
+	    			   '\"date\" : \"' + c.date + '\", ' +
 	    			   '\"location\" : \"' + c.location + '\"},');
 			console.log('***********************');
 		}
@@ -2003,6 +2004,7 @@ app.get('/card', function (req, res) {
 	    			   '\"picture_id\" : ' + picturejson + ', ' +
 	    			   '\"pet_id\" : ' + petjson + ', ' +
 	    			   '\"writer\" : \"' + c.writer + '\", ' +
+	    			   '\"date\" : \"' + c.date + '\", ' +
 	    			   '\"location\" : \"' + c.location + '\"},';
 		
 	});
@@ -2101,6 +2103,7 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"picture_id\" : \"' + piturejson + '\", ' +
     			   '\"pet_id\" : \"' + petjson + '\", ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
+    			   '\"date\" : \"' + theCard.date + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
 			console.log('***********************');
 		}
@@ -2117,6 +2120,7 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"picture_id\" : \"' + piturejson + '\", ' +
     			   '\"pet_id\" : \"' + petjson + '\", ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
+    			   '\"date\" : \"' + theCard.date + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
     	res.end();
 	}
