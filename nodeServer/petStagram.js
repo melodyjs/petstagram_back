@@ -1107,11 +1107,13 @@ app.get('/user/:user_email', function (req, res) {
 
 });
 
-app.put('/user/:user_email', function (req, res) {
+app.put('/user/:user_email',upload.single('picture'), function (req, res) {
 
 	var user_email = req.params.user_email;
 
 	var u = userFindByEmail(user_email);
+
+	var picture = req.file;
 
 	if(debug){
 		console.log('***********************');
