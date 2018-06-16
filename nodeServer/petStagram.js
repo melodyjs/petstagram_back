@@ -1851,7 +1851,7 @@ app.get('/userPet/:userEmail', function (req, res) {
     
 });
 
-app.post('/card', upload.array('user[image]',3), function (req, res) {
+app.post('/card', upload.array('file',3), function (req, res) {
 
 	var videos = req.body.video;
 	var tags = req.body.tag;
@@ -2037,6 +2037,58 @@ app.get('/card/:card_id', function (req, res) {
 
 	if(theCard){
 
+		var commentjson = '[';
+
+		theCard.comment_id.forEach((c_i) => {
+
+			var theComment = comments.find((cc) => cc.comment_id == c_i);
+			
+			commentjson = commentjson + '{\"id\" : ' + theComment.comment_id + ', ' +
+    			   '\"text\" : \"' + theComment.text + '\", ' +
+    			   '\"date\" : \"' + theComment.date + '\", ' +
+    			   '\"userEmail\" : \"' + theComment.user_email + '\", ' +
+    			   '\"card_id\" : \"' + theComment.card_id + '\"}, ';
+
+		});
+
+		if(theCard.comment_id > 0){
+			commentjson = commentjson.substring(0, commentjson.length-2) + ']';
+		}
+		else{
+			commentjson = '[]';
+		}
+
+
+		var picturejson = '[';
+
+		theCard.picture_id.forEach((p_i) => {
+
+			var thePicture = pictures.find((p) => p.picture_id == p_i);
+			
+			picturejson = picturejson + '{\"id\" : ' + thePicture.picture_id + ', ' +
+    			   '\"picture_url\" : \"' + thePicture.picture_id + '\", ' +
+    			   '\"size\" : \"' + thePicture.size + '\", ' +
+    			   '\"card_id\" : \"' + thePicture.card_id + '\"}, ';
+
+		});
+
+		if(theCard.picture_id > 0){
+			picturejson = picturejson.substring(0, picturejson.length-2) + ']';
+		}
+		else{
+			picturejson = '[]';
+		}
+
+
+		var thePet = pets.find((p) => p.pet_id = theCard.pet_id);
+
+		var petjson = '{\"id\" : ' + thePet.pet_id + ', ' +
+    			   '\"petName\" : \"' + thePet.pet_name + '\", ' +
+    			   '\"petProfileImage\" : \"' + thePet.profile_pic_url + '\", ' +
+    			   '\"petBirthDay\" : \"' + thePet.pet_birthday + '\", ' +
+    			   '\"introduceText\" : \"' + thePet.intro + '\", ' +
+    			   '\"owner\" : \"' + arrayToString(thePet.owners) + '\"}';
+
 		if(debug){
 			console.log('<CARD FOUND>');
 			console.log('{\"id\" : ' + theCard.card_id + ', ' +
@@ -2044,10 +2096,10 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"text\" : \"' + theCard.text + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
     			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
-    			   '\"comment_id\" : \"' + arrayToString(theCard.comment_id) + '\", ' +
+    			   '\"comment_id\" : \"' + commentjson + '\", ' +
     			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
-    			   '\"picture_id\" : \"' + arrayToString(theCard.picture_id) + '\", ' +
-    			   '\"pet_id\" : \"' + arrayToString(theCard.pet_id) + '\", ' +
+    			   '\"picture_id\" : \"' + piturejson + '\", ' +
+    			   '\"pet_id\" : \"' + petjson + '\", ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
 			console.log('***********************');
@@ -2059,11 +2111,11 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"title\" : \"' + theCard.title + '\", ' +
     			   '\"text\" : \"' + theCard.text + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
-    			   '\"tag_id\" : ' + arrayToString(theCard.tag_id) + ', ' +
-    			   '\"comment_id\" : ' + arrayToString(theCard.comment_id) + ', ' +
-    			   '\"video_id\" : ' + arrayToString(theCard.video_id) + ', ' +
-    			   '\"picture_id\" : ' + arrayToString(theCard.picture_id) + ', ' +
-    			   '\"pet_id\" : ' + arrayToString(theCard.pet_id) + ', ' +
+    			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
+    			   '\"comment_id\" : \"' + commentjson + '\", ' +
+    			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
+    			   '\"picture_id\" : \"' + piturejson + '\", ' +
+    			   '\"pet_id\" : \"' + petjson + '\", ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"location\" : \"' + theCard.location + '\"}');
     	res.end();
