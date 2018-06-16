@@ -1119,6 +1119,7 @@ app.put('/user/:user_email',upload.single('picture'), function (req, res) {
 		console.log('***********************');
 		console.log('[/user/:user_email] PUT');
 		console.log('user_email = ' + user_email);
+		console.log('picture = ' + picture);
 	}
 
 	if(u){
