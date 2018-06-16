@@ -1984,9 +1984,9 @@ app.get('/card', function (req, res) {
 	    			   '\"text\" : \"' + c.text + '\", ' +
 	    			   '\"date\" : \"' + c.date + '\", ' +
 	    			   '\"tag_id\" : ' + arrayToString(c.tag_id) + ', ' +
-	    			   '\"comment_id\" : ' + commentjson + ', ' +
+	    			   '\"comments\" : ' + commentjson + ', ' +
 	    			   '\"video_id\" : ' + arrayToString(c.video_id) + '\", ' +
-	    			   '\"picture_id\" : ' + picturejson + ', ' +
+	    			   '\"pictures\" : ' + picturejson + ', ' +
 	    			   '\"pet_id\" : ' + petjson + ', ' +
 	    			   '\"writer\" : \"' + c.writer + '\", ' +
 	    			   '\"date\" : \"' + c.date + '\", ' +
@@ -1999,9 +1999,9 @@ app.get('/card', function (req, res) {
 	    			   '\"text\" : \"' + c.text + '\", ' +
 	    			   '\"date\" : \"' + c.date + '\", ' +
 	    			   '\"tag_id\" : ' + arrayToString(c.tag_id) + ', ' +
-	    			   '\"comment_id\" : ' + commentjson + ', ' +
+	    			   '\"comments\" : ' + commentjson + ', ' +
 	    			   '\"video_id\" : ' + arrayToString(c.video_id) + '\", ' +
-	    			   '\"picture_id\" : ' + picturejson + ', ' +
+	    			   '\"pictures\" : ' + picturejson + ', ' +
 	    			   '\"pet_id\" : ' + petjson + ', ' +
 	    			   '\"writer\" : \"' + c.writer + '\", ' +
 	    			   '\"date\" : \"' + c.date + '\", ' +
@@ -2098,9 +2098,9 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"text\" : \"' + theCard.text + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
     			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
-    			   '\"comment_id\" : \"' + commentjson + '\", ' +
+    			   '\"comments\" : \"' + commentjson + '\", ' +
     			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
-    			   '\"picture_id\" : \"' + piturejson + '\", ' +
+    			   '\"pictures\" : \"' + piturejson + '\", ' +
     			   '\"pet_id\" : \"' + petjson + '\", ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
@@ -2115,9 +2115,9 @@ app.get('/card/:card_id', function (req, res) {
     			   '\"text\" : \"' + theCard.text + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
     			   '\"tag_id\" : \"' + arrayToString(theCard.tag_id) + '\", ' +
-    			   '\"comment_id\" : \"' + commentjson + '\", ' +
+    			   '\"comments\" : \"' + commentjson + '\", ' +
     			   '\"video_id\" : \"' + arrayToString(theCard.video_id) + '\", ' +
-    			   '\"picture_id\" : \"' + piturejson + '\", ' +
+    			   '\"pictures\" : \"' + piturejson + '\", ' +
     			   '\"pet_id\" : \"' + petjson + '\", ' +
     			   '\"writer\" : \"' + theCard.writer + '\", ' +
     			   '\"date\" : \"' + theCard.date + '\", ' +
@@ -2706,15 +2706,21 @@ app.post('/like', function (req, res) {
 
 });
 
-app.delete('/like/:like_id', function (req, res) {
+app.delete('/like/:card_id', function (req, res) {
 
-	var like_id = req.params.like_id;
+	var card_id = req.params.card_id;
+	var user_email = authToEmail(req.headers.authorization);
 
 	if(debug){
 		console.log('***********************');
-		console.log('[/like/:like_id] DELETE');
-		console.log('like_id = ' + like_id);
+		console.log('[/like/:card_id] DELETE');
+		console.log('card_id = ' + card_id);
 	}
+
+	var theCard = cardFindById(card_id)
+	var theUser = userFindByEmail(user_email);
+
+	var like_id = theCard.like_id.find((l_i) => (theUser.like_id.find((u_l_i) => u_l_i == l_i)));
 
 	var theLike = likeFindById(like_id);
 
